@@ -1,0 +1,61 @@
+import React from 'react';
+import SHAHID_LOGO from 'assets/images/logo-dark.svg';
+import { makeStyles } from '@material-ui/core/styles';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+
+import './AnonymousUserLayout.scss';
+import useStepperStore from 'stores/StepperStore/stepper';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+  },
+  button: {
+    marginRight: theme.spacing(1),
+  },
+  instructions: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+}));
+
+const getSteps = () => {
+  return ['', '', '', ''];
+};
+
+const AnonymousUserLayout: React.FC = ({ children }) => {
+  const classes = useStyles();
+  const [stateStepper] = useStepperStore();
+  const steps = getSteps();
+  return (
+    <div className="full-screen anonymous-layout">
+      <div className="anonymous-layout-content">
+        <>
+          <div className="mt-5 mb-5">
+            <div className="mb-4 d-flex justify-content-center">
+              <img src={SHAHID_LOGO} className="d-block" alt="LOGO_ALT" height="30" />
+            </div>
+            <div className={classes.root}>
+              <Stepper activeStep={stateStepper.activeStep}>
+                {steps.map((label, index) => {
+                  const stepProps: any = {};
+                  const labelProps: any = {};
+                  return (
+                    <Step key={index} {...stepProps}>
+                      <StepLabel {...labelProps}>{label}</StepLabel>
+                    </Step>
+                  );
+                })}
+              </Stepper>
+              <div>{children}</div>
+            </div>
+          </div>
+        </>
+      </div>
+    </div>
+  );
+};
+
+export default AnonymousUserLayout;

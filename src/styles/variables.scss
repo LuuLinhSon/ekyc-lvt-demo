@@ -1,0 +1,143 @@
+@import '~bootstrap/scss/bootstrap.scss';
+
+$distance: 8px;
+
+/** Color **/
+$text-color: #353c48;
+$white: #fff;
+$black: #000;
+$blue: #293165;
+$violet: #848ecf;
+$error: #f00;
+$colorGrey: #333;
+$colorLightGrey: #999;
+$colorCopyText: #0c0;
+$colorStatus: #f90;
+$bodyBackgroundColor: #f8f9fd;
+$sidebarWidth: 250px;
+$sidebarWidthSmall: 60px;
+$seasonSection: 360px;
+$footerBorderColor: #eaeff0;
+$footerColor: #777986;
+$currentUserBg: #eaeff0;
+$blueBackground: #dce0f8;
+$disabledBg: #e4e4e4;
+$disabledColor: #e4e4e4;
+$invalidBackground: rgba(255, 111, 112, 0.05);
+$green-placeholder: #008061;
+$grey-placeholder: #d8d8d8;
+$blue-preview-title: #293165;
+$black-preview-title: $text-color;
+$border-logo: #eaeff0;
+$grey: #ccc;
+$grey-1: #f2f2f2;
+$grey-border: #d1d2db;
+$grey-thead: #e9ecef;
+$border-filter: rgb(204, 204, 204);
+$border-input: #dee2e6;
+$drop-down-grey-color: #868e96;
+$drop-down-grey-border-color: #dee2e6;
+$date-picker-selected-color: #1eb7ff;
+$button-hover: #1eb7ff;
+$info-color: #33ae9a;
+$info-border-color-hover: #227366;
+$info-color-hover: #227366;
+$secondary-color: #868e96;
+$secondary-border-color-hover: #666e76;
+$secondary-color-hover: #6c757d;
+$danger-color: #ed1c24;
+$warning-color: #f27212;
+$safety-color: #1bb934;
+$empty-input-background: #f9fafc;
+$border-drop-down-focus: #9ee0ff;
+
+$status-bg-active: #dafaed;
+$status-bg-inactive: #eaeff0;
+$status-bg-expired: rgba($status-bg-inactive, 0.5);
+$status-color-active: #0db669;
+$status-color-inactive: #231f20;
+$status-color-expired: rgba($status-color-inactive, 0.5);
+$show-type-selected-color: #e2dfde;
+
+/* Login form */
+$btn-signin-bg: linear-gradient(90deg, #0c9 0, #09f);
+$btn-signin-bg-hover: linear-gradient(90deg, #0c9 0, #0c9);
+$btn-signin-bg-disabled: #3e495b;
+$btn-signin-text-disabled: #a3afc2;
+$btn-signin-border: #009fea;
+$text-label: #8493a5;
+$text-navigate: #3f4651;
+$text-field-focus: #495057;
+$border-field-focus: #80bdff;
+
+$breadcrumbs-parent-color: #1f2d3d;
+$breadcrumbs-child-color: #8493a5;
+
+/** Layout **/
+$anonymous-width-content: 520px;
+$padding-content: 25px;
+$search-height: 44px;
+$search-height-small: 34px;
+$search-border-color: $input-border-color;
+$lookup-field-image-width: 60px;
+
+/** Animation **/
+$slide-duration: 0.3s;
+$hover-duration: 0.15s;
+
+/** User Group Permissions **/
+$border-color: #e9ecef;
+$list-group-header-color: #f1f1f1;
+$group-header-color: #f8f8f8;
+
+/* Checkbox */
+$checkbox-border-color: #007bff;
+
+// dropdown button
+$drop-down-button-border: 1px solid #dee2e6;
+$sidebar-create-drop-down-menu: #3f4651;
+$sidebar-create-drop-down-menu-border: rgba(255, 255, 255, 0.2);
+
+// screen
+$tablet-width: 768px;
+$laptop-width: 1024px;
+$desktop-width: 1281px;
+
+$favorite-green: #3c3;
+
+// season listing in serialized show
+$season-wrapper-background-color: $white;
+$season-info-background-color: #f1f1f1;
+$action-added-color: #0db669;
+$season-title-color: $black;
+$episode-hover-background: #f1f1f1;
+$separate-line-section: #dee2e6;
+$episode-selected-bg: #f7f7f7;
+$season-selected-bg: #ededed;
+
+$status-approval-pending: #1eb7ff;
+$status-activated-color: #11b934;
+$status-draft-color: #868e96;
+$status-deleted-color: #3f4651;
+$status-inactivate-color: #868e96;
+$status-updated-color: #f27212;
+$status-rejected-color: #ed1c24;
+
+$show-selected-color: #c6c6c6;
+$season-in-serialized-show-bg: #f5f5f6;
+$season-selected-in-schedule-bg: #e8e8e8;
+
+$card-header-bg: rgb(63, 70, 81);
+$fullscreen-bg: #adb5bd;
+
+$ready-for-scheduling-status: #f00;
+$partial-scheduled-status: #0cf;
+$scheduled-status: #f60;
+$live-status: #0f0;
+$status-ready-asset: #008000;
+$expired-status: #7a869a;
+$salem: #0a6d48;
+
+$shadow-color: rgba(31, 45, 61, 0.07);
+
+$unread-notification: #f00;
