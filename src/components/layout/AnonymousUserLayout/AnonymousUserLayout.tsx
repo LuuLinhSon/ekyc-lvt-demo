@@ -29,6 +29,7 @@ const AnonymousUserLayout: React.FC = ({ children }) => {
   const classes = useStyles();
   const [stateStepper] = useStepperStore();
   const steps = getSteps();
+
   return (
     <div className="full-screen anonymous-layout">
       <div className="anonymous-layout-content">

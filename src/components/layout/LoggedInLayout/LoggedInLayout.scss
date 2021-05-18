@@ -1,0 +1,17 @@
+@import '../../../styles/variables';
+
+.logged-in-layout {
+  display: flex;
+  justify-content: center;
+
+  &-content {
+    width: $anonymous-width-content;
+  }
+}
+
+.login-layout {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 10px;
+}

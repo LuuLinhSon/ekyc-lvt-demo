@@ -3,7 +3,7 @@ import { Route, Redirect, RouteProps } from 'react-router-dom';
 import RoutesString from './routesString';
 import LoggedInLayout from '../components/layout/LoggedInLayout/LoggedInLayout';
 import Spinner from 'components/spinner/Spinner';
-
+import useAuthentication from 'stores/AuthenticationStore/authentication';
 interface IProps {
   component: React.FC;
   path: string;
@@ -22,9 +22,7 @@ const renderRoute = (Component: React.FC) => (props: RouteProps) => {
 
 const PrivateRoute: React.FC<IProps & RouteProps> = ({ component, ...rest }) => {
   const Layout = LoggedInLayout;
-  const state = {
-    loggedIn: false,
-  };
+  const [state] = useAuthentication();
 
   if (!state.loggedIn) {
     return (

@@ -2,6 +2,8 @@ import { createStore, createHook, StoreActionApi, createContainer } from 'react-
 import { AuthenticationStates } from './authenticationType';
 import API from 'api';
 import ApiConfig, { SESSION_TIMEOUT } from 'config';
+import databases from 'cache';
+// import { storeKeyStepper } from 'stores/StepperStore/stepper';
 
 export const AUTHENTICATION_STORE = 'StoreAuthentication';
 type StoreApi = StoreActionApi<AuthenticationStates>;
@@ -23,18 +25,38 @@ export const requestLogin = async (token: string, email: string) => {
 };
 
 export const actions = {
-  onLoad: (payload: AuthenticationStates) => ({ setState }: StoreApi) => {
-    setState({ ...payload });
-  },
-  logout: () => async ({ setState }: StoreApi) => {},
-  login: (values: any) => async ({ setState, getState }: StoreApi) => {},
-  setAuthenticate: (auth: any) => ({ setState, getState }: StoreApi) => {
-    const prevState = getState();
-    setState({
-      ...prevState,
-      authenticate: auth,
-    });
-  },
+  onLoad:
+    (payload: AuthenticationStates) =>
+    ({ setState }: StoreApi) => {
+      setState({ ...payload });
+    },
+  logout:
+    () =>
+    async ({ setState }: StoreApi) => {
+      setState({ ...initialState });
+      if (databases) {
+        await databases.removeItem(storeKey);
+        // await databases.removeItem(storeKeyStepper);
+      }
+    },
+  login:
+    (values: any) =>
+    async ({ setState, getState }: StoreApi) => {
+      const prevState = getState();
+      setState({
+        ...prevState,
+        loggedIn: true,
+      });
+    },
+  setAuthenticate:
+    (auth: any) =>
+    ({ setState, getState }: StoreApi) => {
+      const prevState = getState();
+      setState({
+        ...prevState,
+        authenticate: auth,
+      });
+    },
 };
 
 export const initialState: AuthenticationStates = {
@@ -80,9 +102,11 @@ type StoreContainerProps = {
   initialState: AuthenticationStates;
 };
 export const AuthenticationContainer = createContainer<AuthenticationStates, Actions, StoreContainerProps>(Store, {
-  onInit: () => ({ setState }: StoreApi, { initialState }) => {
-    setState({ ...initialState });
-  },
+  onInit:
+    () =>
+    ({ setState }: StoreApi, { initialState }) => {
+      setState({ ...initialState });
+    },
 });
 
 export default useAuthentication;

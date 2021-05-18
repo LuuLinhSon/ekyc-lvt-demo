@@ -12,6 +12,7 @@ import RoutesString from 'pages/routesString';
 import Webcam from 'react-webcam';
 
 import './StepThree.scss';
+import useStepperStore from 'stores/StepperStore/stepper';
 
 const WIDTH = 420;
 const HEIGHT = 350;
@@ -45,6 +46,7 @@ const getStepContent = (path: string) => {
 const StepThree: React.FC<any> = (props) => {
   const location = useLocation();
   const history = useHistory();
+  const [stateStepper, actionStepper] = useStepperStore();
   const isStepThreeOne = location?.pathname === RoutesString.StepThreeOne;
   const [imgsrc, setImgSrc] = useState<any>(undefined);
   const webcamRef = useRef<Webcam>(null);
@@ -53,8 +55,13 @@ const StepThree: React.FC<any> = (props) => {
   let timer: any = null;
 
   useEffect(() => {
-    loadModels();
-    setInputDevice();
+    const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+    if (isCurrentPage) {
+      loadModels();
+      setInputDevice();
+      return;
+    }
+    history.push(stateStepper?.currentPathStep || '/');
 
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,6 +102,9 @@ const StepThree: React.FC<any> = (props) => {
 
   const next = () => {
     isStepThreeOne ? history.push(RoutesString.StepTreeTwo) : history.push(RoutesString.StepThreeThree);
+    isStepThreeOne
+      ? actionStepper.setCurrentPathStep(RoutesString.StepTreeTwo)
+      : actionStepper.setCurrentPathStep(RoutesString.StepThreeThree);
   };
 
   return (

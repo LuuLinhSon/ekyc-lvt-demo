@@ -33,9 +33,9 @@ export const Pages = {
 };
 
 const RoutesString = {
-  Welcome: `/${PUBLIC_PAGES.NAME.WELCOME}`,
+  // Welcome: `/${PUBLIC_PAGES.NAME.WELCOME}`,
   Login: `/${PUBLIC_PAGES.NAME.LOGIN}`,
-  CameraFaceDetect: `/${PUBLIC_PAGES.NAME.CAMERA_FACE_DETECT}`,
+  // CameraFaceDetect: `/${PUBLIC_PAGES.NAME.CAMERA_FACE_DETECT}`,
   StepOne: `/${PUBLIC_PAGES.NAME.STEP_ONE}`,
   StepTwo: `/${PUBLIC_PAGES.NAME.STEP_TWO}`,
   StepTwoThree: `/${PUBLIC_PAGES.NAME.STEP_TWO_THREE}`,

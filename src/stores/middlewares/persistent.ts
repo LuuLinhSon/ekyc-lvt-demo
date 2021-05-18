@@ -1,10 +1,11 @@
 import { STORE_NAME } from 'api/storeAPI';
 import { defaults, StoreState } from 'react-sweet-state';
 import { AUTHENTICATION_STORE } from 'stores/AuthenticationStore/authentication';
+import { SEPPER_STORE } from 'stores/StepperStore/stepper';
 
 import database from '../../cache';
 
-const WHITE_LIST = [STORE_NAME, AUTHENTICATION_STORE];
+const WHITE_LIST = [STORE_NAME, AUTHENTICATION_STORE, SEPPER_STORE];
 
 const persistent = (storeState: StoreState<any>) => (next: any) => (fn: any) => {
   const result = next(fn);

@@ -12,13 +12,20 @@ const HEIGHT = 350;
 
 const StepTwoScreenshot: React.FC<any> = (props) => {
   const webcamRef = useRef<Webcam>(null);
-  const [, actionStepper] = useStepperStore();
+  const [stateStepper, actionStepper] = useStepperStore();
   const history = useHistory();
   const location = useLocation();
   const isCaptureFrontCMNDStep = location?.pathname === RoutesString.StepTwoTwo;
 
   useEffect(() => {
     setInputDevice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+    if (isCurrentPage) return;
+    history.push(stateStepper.currentPathStep);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -37,6 +44,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
   const nextToStep = () => {
     isCaptureFrontCMNDStep ? history.push(RoutesString.StepTwoThree) : history.push(RoutesString.StepThreeOne);
     !isCaptureFrontCMNDStep && actionStepper.nextStep();
+    isCaptureFrontCMNDStep
+      ? actionStepper.setCurrentPathStep(RoutesString.StepTwoThree)
+      : actionStepper.setCurrentPathStep(RoutesString.StepThreeOne);
   };
 
   return (

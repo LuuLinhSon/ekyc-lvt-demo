@@ -12,7 +12,7 @@ export const PUBLIC_PAGES = {
     ACCESS_DENIED: 'access-denied-403',
     CAMERA_FACE_DETECT: 'camera-face-detect',
     EKYC_JOURNY: 'ekyc-journy',
-    STEP_ONE: 'step-1',
+    STEP_ONE: '/',
     STEP_TWO: 'step-2-1',
     STEP_TWO_TWO: 'step-2-2',
     STEP_TWO_THREE: 'step-2-3',

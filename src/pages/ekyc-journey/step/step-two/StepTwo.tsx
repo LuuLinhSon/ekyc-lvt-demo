@@ -1,15 +1,26 @@
 import { Button } from '@material-ui/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import CMND_CCCD from 'assets/images/cmnd.png';
 import './StepTwo.scss';
-import { useHistory, withRouter } from 'react-router-dom';
+import { useHistory, withRouter, useLocation } from 'react-router-dom';
 import RoutesString from 'pages/routesString';
+import useStepperStore from 'stores/StepperStore/stepper';
 
 const StepTwo: React.FC<any> = (props) => {
   const history = useHistory();
+  const location = useLocation();
+  const [stateStepper, actionStepper] = useStepperStore();
   const nextToStep = () => {
     history.push(RoutesString.StepTwoTwo);
+    actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
   };
+
+  useEffect(() => {
+    const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+    if (isCurrentPage) return;
+    history.push(stateStepper.currentPathStep);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="container">
