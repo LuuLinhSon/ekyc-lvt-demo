@@ -1,22 +1,10 @@
 import { Button, TextField } from '@material-ui/core';
 import { Form, withFormik, FormikBag } from 'formik';
-import RoutesString from 'pages/routesString';
-import React, { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import useAuthentication from 'stores/AuthenticationStore/authentication';
-import useStepperStore from 'stores/StepperStore/stepper';
+import React from 'react';
 import './StepOne.scss';
 
 const StepOne: React.FC<any> = (props) => {
   const { values, handleSubmit, setFieldValue } = props;
-  const history = useHistory();
-  const [, actionStepper] = useStepperStore();
-  const [state, action] = useAuthentication();
-  const nextToStep = () => {
-    history.push(RoutesString.StepTwo);
-    actionStepper.setCurrentPathStep(RoutesString.StepTwo);
-    actionStepper.nextStep();
-  };
 
   const onHandleChange = (name: string, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFieldValue(name, event.currentTarget.value);
@@ -25,27 +13,6 @@ const StepOne: React.FC<any> = (props) => {
   const disabled: () => boolean = () => {
     return values?.password === '' || values?.phone === '';
   };
-
-  const next = async () => {
-    handleSubmit();
-    nextToStep();
-    await action.login('');
-  };
-
-  useEffect(() => {
-    // actionStepper.resetStepper();
-    if (state.loggedIn) {
-      const locationState = props?.location?.state;
-
-      if (locationState?.from) {
-        history.push(locationState.from);
-        return;
-      }
-      history.push(RoutesString.StepTwo);
-      return;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.loggedIn, history]);
 
   return (
     <Form>
@@ -76,7 +43,13 @@ const StepOne: React.FC<any> = (props) => {
             onChange={(e) => onHandleChange('password', e)}
           />
         </div>
-        <Button disabled={disabled()} className="next-button" variant="contained" color="primary" onClick={next}>
+        <Button
+          disabled={disabled()}
+          className="next-button"
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit}
+        >
           Tiếp tục
         </Button>
       </div>

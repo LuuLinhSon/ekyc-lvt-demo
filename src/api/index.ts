@@ -3,7 +3,7 @@ import { stringify, parse } from 'query-string';
 import get from 'lodash/get';
 
 import { APIFunction, ErrorObjectType } from './api.d';
-import './interceptors';
+// import './interceptors';
 
 export const API_ERROR_MESSAGE_GENERAL = 'Oops. Something wrong happened';
 export const ERROR_MESSAGE_NO_NETWORK = 'ERROR_MESSAGE_NO_NETWORK';
@@ -35,7 +35,7 @@ const api: APIFunction = async ({
       url,
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/json',
+        Accept: '*/*',
         ...headers,
       },
       params: newParams,

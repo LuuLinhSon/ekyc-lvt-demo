@@ -2,7 +2,7 @@ import { Button } from '@material-ui/core';
 import React, { useEffect } from 'react';
 import CMND_CCCD from 'assets/images/cmnd.png';
 import './StepTwo.scss';
-import { useHistory, withRouter, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, withRouter } from 'react-router-dom';
 import RoutesString from 'pages/routesString';
 import useStepperStore from 'stores/StepperStore/stepper';
 

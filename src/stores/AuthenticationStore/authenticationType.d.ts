@@ -1,44 +1,47 @@
-interface UserInformation {
-  id: string;
-  firstName: string | null;
-  lastName: string | null;
-  email: string;
-  token: string;
-  externalToken?: string;
-  sessionId?: string;
-  externalSessionId?: string;
-  externalUserId?: string;
-  permissions: string[];
+interface UserInformationState {
+  userId: string;
+  approveStatus: string;
+  custId: string;
+  custNo: string;
+  fullName: string;
+  needChangePass: string;
+  primaryEmail: string;
+  primaryPhone: string;
+  primaryUser: string;
+  userName: string;
+  userStatus: string;
+  userType: string;
+  userAvatar: string;
+}
+
+interface ClientHeaderState {
+  language: string;
+  clientRequestId: string;
+  platform: string;
+  service: string;
+  function: string;
+}
+
+interface CustomerState {
+  cifNo: string;
+  customerId: string;
+  customerNo: string;
+}
+
+interface SessionState {
+  userId: string;
+  userName: string;
+  sessionId: string;
 }
 
 interface AuthenticationStates {
-  message: string;
-  user: UserInformation;
+  clientHeader: ClientHeaderState;
+  user: UserInformationState;
+  customer: CustomerState;
+  session: SessionState;
   loggedIn: boolean;
-  failedTimes: number;
   initiated?: boolean;
-  authenticate: AuthenticateInformation;
-  captchaToken: string | null;
   timeout: number;
-  mediaAuthentication: MediaAuthentication;
 }
 
-interface MediaAuthentication {
-  token: string;
-  startTime: number;
-}
-
-interface AuthenticateInformation {
-  accessToken: string;
-  refreshToken: string;
-  menuItems: string[];
-}
-
-interface TokenData {
-  iss: string;
-  sub: string;
-  exp: number;
-  iat: number;
-}
-
-export { AuthenticationStates, UserInformation, AuthenticateInformation, TokenData, MediaAuthentication };
+export { AuthenticationStates, UserInformationState, ClientHeaderState, CustomerState, SessionState };

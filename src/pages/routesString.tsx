@@ -8,7 +8,7 @@ const AccessDenied = lazy(() => import('./access-denied/AccessDenied'));
 const Welcome = lazy(() => import('./welcome/Welcome'));
 const Main = lazy(() => import('./main/Main'));
 const CameraFaceDetect = lazy(() => import('./camera-face//CameraFaceDetect'));
-const StepOne = lazy(() => import('./ekyc-journey/step/step-one/StepOne'));
+const StepOne = lazy(() => import('./ekyc-journey/step/step-one/StepOneContainer'));
 const StepTwo = lazy(() => import('./ekyc-journey/step/step-two/StepTwo'));
 const StepTwoTwo = lazy(() => import('./ekyc-journey/step/step-two/StepTwoOne'));
 const StepTwoThree = lazy(() => import('./ekyc-journey/step/step-two/StepTwoOne'));
@@ -36,7 +36,7 @@ const RoutesString = {
   // Welcome: `/${PUBLIC_PAGES.NAME.WELCOME}`,
   Login: `/${PUBLIC_PAGES.NAME.LOGIN}`,
   // CameraFaceDetect: `/${PUBLIC_PAGES.NAME.CAMERA_FACE_DETECT}`,
-  StepOne: `/${PUBLIC_PAGES.NAME.STEP_ONE}`,
+  StepOne: `/`,
   StepTwo: `/${PUBLIC_PAGES.NAME.STEP_TWO}`,
   StepTwoThree: `/${PUBLIC_PAGES.NAME.STEP_TWO_THREE}`,
   StepTwoTwo: `/${PUBLIC_PAGES.NAME.STEP_TWO_TWO}`,
