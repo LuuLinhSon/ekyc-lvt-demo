@@ -12,6 +12,7 @@ const StepOne = lazy(() => import('./ekyc-journey/step/step-one/StepOneContainer
 const StepTwo = lazy(() => import('./ekyc-journey/step/step-two/StepTwo'));
 const StepTwoTwo = lazy(() => import('./ekyc-journey/step/step-two/StepTwoOne'));
 const StepTwoThree = lazy(() => import('./ekyc-journey/step/step-two/StepTwoOne'));
+const StepEditKYC = lazy(() => import('./ekyc-journey/step/step-two/StepEditKyc'));
 const StepThreeOne = lazy(() => import('./ekyc-journey/step/step-three/StepThree'));
 const StepThreeTwo = lazy(() => import('./ekyc-journey/step/step-three/StepThree'));
 const StepThreeThree = lazy(() => import('./ekyc-journey/step/step-three/StepThreeSpeechToText'));
@@ -25,8 +26,9 @@ export const Pages = {
   CameraFaceDetect,
   StepOne,
   StepTwo,
-  StepTwoThree,
   StepTwoTwo,
+  StepTwoThree,
+  StepEditKYC,
   StepThreeOne,
   StepThreeTwo,
   StepThreeThree,
@@ -40,6 +42,7 @@ const RoutesString = {
   StepTwo: `/${PUBLIC_PAGES.NAME.STEP_TWO}`,
   StepTwoThree: `/${PUBLIC_PAGES.NAME.STEP_TWO_THREE}`,
   StepTwoTwo: `/${PUBLIC_PAGES.NAME.STEP_TWO_TWO}`,
+  StepEditKYC: `/${PUBLIC_PAGES.NAME.STEP_EDIT_KYC}`,
   StepThreeOne: `/${PUBLIC_PAGES.NAME.STEP_THREE_ONE}`,
   StepTreeTwo: `/${PUBLIC_PAGES.NAME.STEP_THREE_TWO}`,
   StepThreeThree: `/${PUBLIC_PAGES.NAME.STEP_THREE_THREE}`,

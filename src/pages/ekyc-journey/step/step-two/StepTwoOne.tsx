@@ -2,19 +2,226 @@ import { Button } from '@material-ui/core';
 import RoutesString from 'pages/routesString';
 import React, { useEffect, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import API from 'api';
+
 import Webcam from 'react-webcam';
 import useStepperStore from 'stores/StepperStore/stepper';
 
 import './StepTwoOne.scss';
+import useAuthentication from 'stores/AuthenticationStore/authentication';
+import { get, isEmpty, omit } from 'lodash';
+import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
+import { useAlert } from 'react-alert';
+
+const sha1 = require('js-sha1');
+
+// import publicIp from 'public-ip';
+// import moment from 'moment';
 
 const WIDTH = 420;
 const HEIGHT = 350;
 
+const YYYYMMDDHHMMSS = () => {
+  const date = new Date();
+  const yyyy = date.getFullYear().toString();
+  const MM = pad(date.getMonth() + 1, 2);
+  const dd = pad(date.getDate(), 2);
+  const hh = pad(date.getHours(), 2);
+  const mm = pad(date.getMinutes(), 2);
+  const ss = pad(date.getSeconds(), 2);
+  const ms = pad(date.getMilliseconds(), 3);
+
+  return `${yyyy}${MM}${dd}${hh}${mm}${ss}.${ms}`;
+};
+
+const getDate = () => {
+  return YYYYMMDDHHMMSS();
+};
+
+const pad = (num: any, length: any) => {
+  let str = `${num}`;
+  while (str.length < length) {
+    str = `0${str}`;
+  }
+  return str;
+};
+
+const initEKYC = async (stateAuthentication: AuthenticationStates) => {
+  const timestamp = new Date().getTime();
+  const clientTime = getDate();
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+  };
+  const initEKYCResponse = await API({
+    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    method: 'POST',
+    headers,
+    data: {
+      clientHeader: {
+        language: 'VN',
+        clientRequestId: `${timestamp}`,
+        deviceId: 'WEB_TEST',
+        clientAddress: '192.168.201.140',
+        platform: 'LOCAL',
+        function: 'initTransEKYC',
+      },
+      body: {
+        header: {
+          platform: 'LOCAL',
+          clientRequestId: `${timestamp}`,
+          clientTime,
+          zonedClientTime: `${timestamp}`,
+          channelCode: 'WEBVIVIET',
+          deviceId: 'WEB_TEST',
+          sessionId: stateAuthentication.session.sessionId,
+          userId: stateAuthentication.session.userId,
+          authorizedMode: 0,
+          checkerMode: 0,
+          ip: '192.168.201.140',
+          makerId: 'SONLL',
+          language: 'VN',
+        },
+        ekycAction: 'IDENTIFY',
+      },
+    },
+  });
+
+  return initEKYCResponse;
+};
+
+const ocrFrontEKYC = async (base64: string, ekycId: string, stateAuthentication: AuthenticationStates) => {
+  const timestamp = new Date().getTime();
+  const clientTime = getDate();
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+  };
+  const ocrFrontResponse = await API({
+    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    method: 'POST',
+    headers,
+    data: {
+      clientHeader: {
+        language: 'VN',
+        clientRequestId: `${timestamp + 1000}`,
+        deviceId: 'TESTDEMO',
+        clientAddress: '192.168.201.140',
+        platform: 'LOCAL',
+        function: 'ocrVerify',
+      },
+      body: {
+        header: {
+          platform: 'LOCAL',
+          clientRequestId: `${timestamp + 1000}`,
+          clientTime,
+          zonedClientTime: `${timestamp}`,
+          channelCode: 'WEBVIVIET',
+          deviceId: 'TESTDEMO',
+          sessionId: stateAuthentication.session.sessionId,
+          userId: stateAuthentication.session.userId,
+          authorizedMode: 0,
+          checkerMode: 0,
+          ip: '192.168.201.140',
+          makerId: 'SONLL',
+          language: 'VN',
+          actionCode: 'OCR_FRONT_IMAGE',
+        },
+        cardType: '',
+        ekycId,
+        image: {
+          label: 'FRONT_IMAGE_OCR',
+          base64,
+          secureHash: sha1(base64),
+        },
+      },
+    },
+  });
+
+  return ocrFrontResponse;
+};
+
+const checkConfidence = (confidence: string) => {
+  return confidence === 'Y' ? true : false;
+};
+
+const ocrBackEKYC = async (base64: string, ekycId: string, stateAuthentication: AuthenticationStates) => {
+  const timestamp = new Date().getTime();
+  const clientTime = getDate();
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+  };
+  const ocrFrontResponse = await API({
+    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    method: 'POST',
+    headers,
+    data: {
+      clientHeader: {
+        language: 'VN',
+        clientRequestId: `${timestamp}`,
+        deviceId: 'TESTDEMO',
+        clientAddress: '192.168.201.140',
+        platform: 'LOCAL',
+        function: 'ocrVerify',
+      },
+      body: {
+        header: {
+          platform: 'LOCAL',
+          clientRequestId: `${timestamp}`,
+          clientTime,
+          zonedClientTime: `${timestamp}`,
+          channelCode: 'WEBVIVIET',
+          deviceId: 'TESTDEMO',
+          sessionId: stateAuthentication.session.sessionId,
+          userId: stateAuthentication.session.userId,
+          authorizedMode: 0,
+          checkerMode: 0,
+          ip: '192.168.201.140',
+          makerId: 'SONLL',
+          language: 'VN',
+          actionCode: 'OCR_BACK_IMAGE',
+        },
+        cardType: '',
+        ekycId,
+        image: {
+          label: 'BACK_IMAGE_OCR',
+          base64,
+          secureHash: sha1(base64),
+        },
+      },
+    },
+  });
+
+  return ocrFrontResponse;
+};
+
+const redirectPage = (actionAuthentication: any, actionStepper: any, history: any, actionError: string) => {
+  switch (actionError) {
+    case 'ALL': {
+      actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
+      history.push(RoutesString.StepTwoTwo);
+      actionAuthentication.setActionError('ALL');
+      return;
+    }
+    case 'OCR_FRONT_IMAGE': {
+      actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
+      history.push(RoutesString.StepTwoTwo);
+      actionAuthentication.setActionError('OCR_FRONT_IMAGE');
+      return;
+    }
+    case 'OCR_BACK_IMAGE':
+      return actionAuthentication.setActionError('OCR_BACK_IMAGE');
+    default:
+      return;
+  }
+};
+
 const StepTwoScreenshot: React.FC<any> = (props) => {
   const webcamRef = useRef<Webcam>(null);
-  const [, actionStepper] = useStepperStore();
+  const [stateStepper, actionStepper] = useStepperStore();
+  const [stateAuthentication, actionAuthentication] = useAuthentication();
   const history = useHistory();
   const location = useLocation();
+  const alert = useAlert();
+
   const isCaptureFrontCMNDStep = location?.pathname === RoutesString.StepTwoTwo;
 
   useEffect(() => {
@@ -22,12 +229,12 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
-  //   if (isCurrentPage) return;
-  //   history.push(stateStepper.currentPathStep);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+    if (isCurrentPage) return;
+    history.push(stateStepper.currentPathStep);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setInputDevice = () => {
     navigator.mediaDevices.enumerateDevices().then(async (devices) => {
@@ -35,18 +242,126 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     });
   };
 
-  //   const capture = useCallback(() => {
-  //     const imageSrc = webcamRef?.current?.getScreenshot();
-  //     // tslint:disable-next-line:no-console
-  //     console.log('imageSrc', imageSrc);
-  //   }, []);
+  const captureFront = async () => {
+    const imageSrc = await webcamRef?.current?.getScreenshot();
+    const base64 = imageSrc?.split(',')[1] || '';
 
-  const nextToStep = () => {
-    isCaptureFrontCMNDStep ? history.push(RoutesString.StepTwoThree) : history.push(RoutesString.StepThreeOne);
-    !isCaptureFrontCMNDStep && actionStepper.nextStep();
-    isCaptureFrontCMNDStep
-      ? actionStepper.setCurrentPathStep(RoutesString.StepTwoThree)
-      : actionStepper.setCurrentPathStep(RoutesString.StepThreeOne);
+    try {
+      const initEKYCResponse = await initEKYC(stateAuthentication);
+      const ekycId = get(initEKYCResponse, 'body.ekycId', '');
+      actionAuthentication.setEkycId(ekycId);
+      const ocrFrontEKYCResponse = await ocrFrontEKYC(base64, ekycId, stateAuthentication);
+      const resultCode = get(ocrFrontEKYCResponse, 'body.resultCode', '');
+      const resultDesc = get(ocrFrontEKYCResponse, 'body.resultDesc', '');
+      const actionError = get(ocrFrontEKYCResponse, 'body.actionError', '');
+      const ocrInformation = omit(get(ocrFrontEKYCResponse, 'body', {}), ['resultCode', 'resultDesc']);
+      const ocrInformationByType = {
+        name: get(ocrInformation, 'name'),
+        id: get(ocrInformation, 'id'),
+        brithDay: get(ocrInformation, 'brithDay'),
+        province: get(ocrInformation, 'province'),
+        address: get(ocrInformation, 'address'),
+        people: get(ocrInformation, 'people'),
+        expireDate: get(ocrInformation, 'expireDate'),
+        issueDate: get(ocrInformation, 'issueDate'),
+        sex: get(ocrInformation, 'sex'),
+        sign: get(ocrInformation, 'sign'),
+        time: get(ocrInformation, 'time'),
+        cardType: get(ocrInformation, 'cardType'),
+        provinceDetail: {
+          city: get(ocrInformation, 'provinceDetail.city'),
+          district: get(ocrInformation, 'provinceDetail.district'),
+          precinct: get(ocrInformation, 'provinceDetail.precinct'),
+          street: get(ocrInformation, 'provinceDetail.street'),
+        },
+        nameConfidence: checkConfidence(get(ocrInformation, 'nameConfidence')),
+        idConfidence: checkConfidence(get(ocrInformation, 'idConfidence')),
+        brithDayConfidence: checkConfidence(get(ocrInformation, 'brithDayConfidence')),
+        provinceConfidence: checkConfidence(get(ocrInformation, 'provinceConfidence')),
+        addressConfidence: checkConfidence(get(ocrInformation, 'addressConfidence')),
+        peopleConfidence: checkConfidence(get(ocrInformation, 'peopleConfidence')),
+        expireDateConfidence: checkConfidence(get(ocrInformation, 'expireDateConfidence')),
+        issueDateConfidence: checkConfidence(get(ocrInformation, 'issueDateConfidence')),
+        sexConfidence: checkConfidence(get(ocrInformation, 'sexConfidence')),
+        signConfidence: checkConfidence(get(ocrInformation, 'signConfidence')),
+        timeConfidence: checkConfidence(get(ocrInformation, 'timeConfidence')),
+      };
+
+      if (
+        (resultCode === '0' && stateAuthentication.actionError === 'ALL') ||
+        (resultCode === '0' && stateAuthentication.actionError === null)
+      ) {
+        history.push(RoutesString.StepTwoThree);
+        actionStepper.setCurrentPathStep(RoutesString.StepTwoThree);
+        return;
+      }
+
+      if (resultCode === '0' && stateAuthentication.actionError === 'OCR_FRONT_IMAGE') {
+        actionAuthentication.setOcrInformation(ocrInformationByType);
+        history.push(RoutesString.StepEditKYC);
+        actionStepper.setCurrentPathStep(RoutesString.StepEditKYC);
+        return;
+      }
+
+      actionAuthentication.setActionError(isEmpty(actionError) ? null : actionError);
+
+      return alert.error(resultDesc);
+    } catch (e) {}
+  };
+
+  const captureBack = async () => {
+    const imageSrc = await webcamRef?.current?.getScreenshot();
+    const base64 = imageSrc?.split(',')[1] || '';
+    const ekycId = stateAuthentication?.ekycId || '';
+    try {
+      const ocrBackEKYCResponse = await ocrBackEKYC(base64, ekycId, stateAuthentication);
+      const resultCode = get(ocrBackEKYCResponse, 'body.resultCode', '');
+      const resultDesc = get(ocrBackEKYCResponse, 'body.resultDesc', '');
+      const actionError = get(ocrBackEKYCResponse, 'body.actionError', '');
+      const ocrInformation = omit(get(ocrBackEKYCResponse, 'body', {}), ['resultCode', 'resultDesc']);
+      const ocrInformationByType = {
+        name: get(ocrInformation, 'name'),
+        id: get(ocrInformation, 'id'),
+        brithDay: get(ocrInformation, 'brithDay'),
+        province: get(ocrInformation, 'province'),
+        address: get(ocrInformation, 'address'),
+        people: get(ocrInformation, 'people'),
+        expireDate: get(ocrInformation, 'expireDate'),
+        issueDate: get(ocrInformation, 'issueDate'),
+        sex: get(ocrInformation, 'sex'),
+        sign: get(ocrInformation, 'sign'),
+        time: get(ocrInformation, 'time'),
+        cardType: get(ocrInformation, 'cardType'),
+        provinceDetail: {
+          city: get(ocrInformation, 'provinceDetail.city'),
+          district: get(ocrInformation, 'provinceDetail.district'),
+          precinct: get(ocrInformation, 'provinceDetail.precinct'),
+          street: get(ocrInformation, 'provinceDetail.street'),
+        },
+        nameConfidence: checkConfidence(get(ocrInformation, 'nameConfidence')),
+        idConfidence: checkConfidence(get(ocrInformation, 'idConfidence')),
+        brithDayConfidence: checkConfidence(get(ocrInformation, 'brithDayConfidence')),
+        provinceConfidence: checkConfidence(get(ocrInformation, 'provinceConfidence')),
+        addressConfidence: checkConfidence(get(ocrInformation, 'addressConfidence')),
+        peopleConfidence: checkConfidence(get(ocrInformation, 'peopleConfidence')),
+        expireDateConfidence: checkConfidence(get(ocrInformation, 'expireDateConfidence')),
+        issueDateConfidence: checkConfidence(get(ocrInformation, 'issueDateConfidence')),
+        sexConfidence: checkConfidence(get(ocrInformation, 'sexConfidence')),
+        signConfidence: checkConfidence(get(ocrInformation, 'signConfidence')),
+        timeConfidence: checkConfidence(get(ocrInformation, 'timeConfidence')),
+      };
+
+      if (resultCode === '0') {
+        actionAuthentication.setOcrInformation(ocrInformationByType);
+        history.push(RoutesString.StepEditKYC);
+        actionStepper.setCurrentPathStep(RoutesString.StepEditKYC);
+        return;
+      }
+
+      await redirectPage(actionAuthentication, actionStepper, history, actionError);
+
+      return alert.error(resultDesc);
+    } catch (e) {}
   };
 
   return (
@@ -79,7 +394,12 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
           </div>
         </div>
       </div>
-      <Button className="next-button" variant="contained" color="primary" onClick={nextToStep}>
+      <Button
+        className="next-button"
+        variant="contained"
+        color="primary"
+        onClick={isCaptureFrontCMNDStep ? captureFront : captureBack}
+      >
         Chụp
       </Button>
     </div>

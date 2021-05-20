@@ -1,5 +1,5 @@
 import React from 'react';
-import SHAHID_LOGO from 'assets/images/logo-dark.svg';
+import LVT_LOGO from 'assets/images/lvt-img.png';
 import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -36,7 +36,7 @@ const AnonymousUserLayout: React.FC = ({ children }) => {
         <>
           <div className="mt-5 mb-5">
             <div className="mb-4 d-flex justify-content-center">
-              <img src={SHAHID_LOGO} className="d-block" alt="LOGO_ALT" height="30" />
+              <img src={LVT_LOGO} className="d-block" alt="LOGO_ALT" height="50" />
             </div>
             <div className={classes.root}>
               <Stepper activeStep={stateStepper.activeStep}>

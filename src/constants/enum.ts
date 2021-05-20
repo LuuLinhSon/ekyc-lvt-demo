@@ -16,6 +16,7 @@ export const PUBLIC_PAGES = {
     STEP_TWO: 'step-2-1',
     STEP_TWO_TWO: 'step-2-2',
     STEP_TWO_THREE: 'step-2-3',
+    STEP_EDIT_KYC: 'step-2-4',
     STEP_THREE_ONE: 'step-3-1',
     STEP_THREE_TWO: 'step-3-2',
     STEP_THREE_THREE: 'step-3-3',

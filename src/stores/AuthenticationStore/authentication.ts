@@ -1,11 +1,11 @@
 import { createStore, createHook, StoreActionApi, createContainer } from 'react-sweet-state';
-import { AuthenticationStates } from './authenticationType';
+import { AuthenticationStates, OcrInformation } from './authenticationType';
 import { sha256 } from 'js-sha256';
 
 import API from 'api';
 import { SESSION_TIMEOUT } from 'config';
 import databases from 'cache';
-import publicIp from 'public-ip';
+// import publicIp from 'public-ip';
 import { get } from 'lodash';
 import { storeKeyStepper } from 'stores/StepperStore/stepper';
 
@@ -13,7 +13,34 @@ export const AUTHENTICATION_STORE = 'StoreAuthentication';
 type StoreApi = StoreActionApi<AuthenticationStates>;
 type Actions = typeof actions;
 
+const YYYYMMDDHHMMSS = () => {
+  const date = new Date();
+  const yyyy = date.getFullYear().toString();
+  const MM = pad(date.getMonth() + 1, 2);
+  const dd = pad(date.getDate(), 2);
+  const hh = pad(date.getHours(), 2);
+  const mm = pad(date.getMinutes(), 2);
+  const ss = pad(date.getSeconds(), 2);
+  const ms = pad(date.getMilliseconds(), 3);
+
+  return `${yyyy}${MM}${dd}${hh}${mm}${ss}.${ms}`;
+};
+
+const getDate = () => {
+  return YYYYMMDDHHMMSS();
+};
+
+const pad = (num: any, length: any) => {
+  let str = `${num}`;
+  while (str.length < length) {
+    str = `0${str}`;
+  }
+  return str;
+};
+
 export const requestLogin = async (phone: string, password: string) => {
+  const timestamp = new Date().getTime();
+  const clientTime = getDate();
   const headers = {
     'Access-Control-Allow-Origin': '*',
   };
@@ -24,26 +51,26 @@ export const requestLogin = async (phone: string, password: string) => {
     data: {
       clientHeader: {
         language: 'VN',
-        clientRequestId: '1559014103614',
-        deviceId: 'TESTDEMO',
-        clientAddress: await publicIp.v4(),
+        clientRequestId: `${timestamp}`,
+        deviceId: 'WEB_TEST',
+        clientAddress: '192.168.201.140',
         platform: 'LOCAL',
         function: 'secureLogin',
       },
       body: {
         header: {
-          clientRequestId: '1559014103614',
-          clientTime: '20190925093222.939',
-          // zonedClientTime: '{{zonedClientTime}}',
-          channelCode: 'EPAYMENT',
+          clientRequestId: `${timestamp}`,
+          clientTime,
+          zonedClientTime: `${timestamp}`,
+          channelCode: 'WEBVIVIET',
           userName: phone,
           deviceId: 'WEB_TEST',
           authorizedMode: 0,
           checkerMode: 0,
-          ip: await publicIp.v4(),
+          ip: '192.168.201.140',
           language: 'VN',
-          platform: 'android',
-          makerId: 'HUYPQ',
+          platform: 'LOCAL',
+          makerId: 'SONLL',
           appVersion: '1.0.0',
         },
         userPwd: sha256(password),
@@ -54,6 +81,24 @@ export const requestLogin = async (phone: string, password: string) => {
 };
 
 export const actions = {
+  setOcrInformation:
+    (ocrInformation: OcrInformation) =>
+    ({ setState, getState }: StoreApi) => {
+      const prevState = getState();
+      setState({ ...prevState, ocrInformation });
+    },
+  setEkycId:
+    (ekycId: string) =>
+    ({ setState, getState }: StoreApi) => {
+      const prevState = getState();
+      setState({ ...prevState, ekycId });
+    },
+  setActionError:
+    (actionError: string) =>
+    ({ setState, getState }: StoreApi) => {
+      const prevState = getState();
+      setState({ ...prevState, actionError });
+    },
   onLoad:
     (payload: AuthenticationStates) =>
     ({ setState }: StoreApi) => {
@@ -74,8 +119,8 @@ export const actions = {
       const prevState = getState();
       try {
         const response = await requestLogin(values.phone, values.password);
-        const resultDesc = get(response, 'body.resultDesc', '');
-        if (resultDesc === 'success') {
+        const resultCode = get(response, 'body.resultCode', '');
+        if (resultCode === '0') {
           setState({
             ...prevState,
             clientHeader: get(response, 'clientHeader', {}),
@@ -159,6 +204,39 @@ export const initialState: AuthenticationStates = {
     userName: '',
     sessionId: '',
   },
+  ocrInformation: {
+    name: '',
+    id: '',
+    brithDay: '',
+    province: '',
+    address: '',
+    people: '',
+    expireDate: '',
+    issueDate: '',
+    sex: '',
+    sign: '',
+    time: '',
+    cardType: '',
+    provinceDetail: {
+      city: '',
+      district: '',
+      precinct: '',
+      street: '',
+    },
+    nameConfidence: false,
+    idConfidence: false,
+    brithDayConfidence: false,
+    provinceConfidence: false,
+    addressConfidence: false,
+    peopleConfidence: false,
+    expireDateConfidence: false,
+    issueDateConfidence: false,
+    sexConfidence: false,
+    signConfidence: false,
+    timeConfidence: false,
+  },
+  ekycId: null,
+  actionError: null,
   loggedIn: false,
   initiated: false,
   timeout: SESSION_TIMEOUT,
