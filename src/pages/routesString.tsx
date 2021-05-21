@@ -15,7 +15,7 @@ const StepTwoThree = lazy(() => import('./ekyc-journey/step/step-two/StepTwoOne'
 const StepEditKYC = lazy(() => import('./ekyc-journey/step/step-two/StepEditKyc'));
 const StepThreeOne = lazy(() => import('./ekyc-journey/step/step-three/StepThree'));
 const StepThreeTwo = lazy(() => import('./ekyc-journey/step/step-three/StepThree'));
-const StepThreeThree = lazy(() => import('./ekyc-journey/step/step-three/StepThreeSpeechToText'));
+const StepFour = lazy(() => import('./ekyc-journey/step/step-four/StepFour'));
 
 export const Pages = {
   Login,
@@ -31,7 +31,7 @@ export const Pages = {
   StepEditKYC,
   StepThreeOne,
   StepThreeTwo,
-  StepThreeThree,
+  StepFour,
 };
 
 const RoutesString = {
@@ -45,7 +45,7 @@ const RoutesString = {
   StepEditKYC: `/${PUBLIC_PAGES.NAME.STEP_EDIT_KYC}`,
   StepThreeOne: `/${PUBLIC_PAGES.NAME.STEP_THREE_ONE}`,
   StepTreeTwo: `/${PUBLIC_PAGES.NAME.STEP_THREE_TWO}`,
-  StepThreeThree: `/${PUBLIC_PAGES.NAME.STEP_THREE_THREE}`,
+  StepFour: `/${PUBLIC_PAGES.NAME.STEP_FOUR}`,
   TermAndConditions: `/${PUBLIC_PAGES.NAME.TAC}`,
   AccessDenied: `/${PUBLIC_PAGES.NAME.ACCESS_DENIED}`,
   Main: `/${ENTITIES.PATH.MAIN}`,

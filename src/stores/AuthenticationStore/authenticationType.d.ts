@@ -74,6 +74,7 @@ interface AuthenticationStates {
   ocrInformation: OcrInformation;
   ekycId: string | null;
   actionError: string | null;
+  numberVerify: string | null;
   loggedIn: boolean;
   initiated?: boolean;
   timeout: number;

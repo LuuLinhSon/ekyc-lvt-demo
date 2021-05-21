@@ -32,7 +32,7 @@ const Routes: React.FC = (): JSX.Element => {
         <PrivateRoute path={RoutesString.StepEditKYC} exact={true} component={Pages.StepEditKYC} />
         <PrivateRoute path={RoutesString.StepThreeOne} exact={true} component={Pages.StepThreeOne} />
         <PrivateRoute path={RoutesString.StepTreeTwo} exact={true} component={Pages.StepThreeTwo} />
-        <PrivateRoute path={RoutesString.StepThreeThree} exact={true} component={Pages.StepThreeThree} />
+        <PrivateRoute path={RoutesString.StepFour} exact={true} component={Pages.StepFour} />
       </Switch>
     </Provider>
   );

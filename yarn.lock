@@ -2836,6 +2836,13 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
+audio-react-recorder@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/audio-react-recorder/-/audio-react-recorder-1.0.4.tgz#db81f10286c2252af8d42162e1f49dbd1de0dffd"
+  integrity sha512-an7eX0yOGDbZOSu2LvnfWIsI41pkx9nXgtBVbI+9ByS91WKqoVGVb5pbmqHax5sZty2DjOIG/neuxcghIU/ucg==
+  dependencies:
+    prop-types "^15.7.2"
+
 autoprefixer@^9.6.1, autoprefixer@^9.8.6:
   version "9.8.6"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.8.6.tgz#3b73594ca1bf9266320c5acf1588d74dea74210f"
@@ -10892,6 +10899,11 @@ react-transition-group@^4.4.0, react-transition-group@^4.4.1:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
+react-voice-recorder@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-voice-recorder/-/react-voice-recorder-2.1.0.tgz#6dae488bafb4ecf9d4dd014d421810c2b1c51fec"
+  integrity sha512-4R+rA+Q1jJMvCSN7JIBnekOrPbHZaY3eAUUQB6pmvqK+HiJgDh2zUHSHGsw9ZCPgg7JWnUFgYvggDhzTcC3BXA==
+
 react-webcam@^5.2.3:
   version "5.2.3"
   resolved "https://registry.yarnpkg.com/react-webcam/-/react-webcam-5.2.3.tgz#be1ca38694c31a33220cc8ab9ce341358a03bcbc"
@@ -13164,6 +13176,11 @@ use-query-params@^1.1.9:
   integrity sha512-Uyfe+/TECsNNzCSkgUM1MM24OEGxGE4aeWvZEf0a14iQFp/m43wiqI1HZ9oTlrRSZwD5yABeLc9rN+wtiB5B3Q==
   dependencies:
     serialize-query-params "^1.3.3"
+
+use-timer@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/use-timer/-/use-timer-2.0.1.tgz#eef400a83e3fa4af9896fdd6d07d34f676e9373c"
+  integrity sha512-ESFkDYZluJZ+G/CaoOBFxg0TjuG7kgNFNhIFZhqv14ho2WIZwuxkRnEURhyLm9I4vNz+ea9ZowNaOkExDAM+6Q==
 
 use@^3.1.0:
   version "3.1.1"

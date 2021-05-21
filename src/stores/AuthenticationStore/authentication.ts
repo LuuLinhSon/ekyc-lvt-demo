@@ -81,6 +81,12 @@ export const requestLogin = async (phone: string, password: string) => {
 };
 
 export const actions = {
+  setNumberVerify:
+    (numberVerify: string) =>
+    ({ setState, getState }: StoreApi) => {
+      const prevState = getState();
+      setState({ ...prevState, numberVerify });
+    },
   setOcrInformation:
     (ocrInformation: OcrInformation) =>
     ({ setState, getState }: StoreApi) => {
@@ -237,6 +243,7 @@ export const initialState: AuthenticationStates = {
   },
   ekycId: null,
   actionError: null,
+  numberVerify: null,
   loggedIn: false,
   initiated: false,
   timeout: SESSION_TIMEOUT,

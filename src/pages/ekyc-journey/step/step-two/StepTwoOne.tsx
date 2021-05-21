@@ -249,6 +249,10 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     try {
       const initEKYCResponse = await initEKYC(stateAuthentication);
       const ekycId = get(initEKYCResponse, 'body.ekycId', '');
+      const paramsNumberVerify = get(initEKYCResponse, 'body.params', []).find(
+        (element) => element.key === 'A3_LIST_NUMBER',
+      );
+      actionAuthentication.setNumberVerify(paramsNumberVerify.value);
       actionAuthentication.setEkycId(ekycId);
       const ocrFrontEKYCResponse = await ocrFrontEKYC(base64, ekycId, stateAuthentication);
       const resultCode = get(ocrFrontEKYCResponse, 'body.resultCode', '');
