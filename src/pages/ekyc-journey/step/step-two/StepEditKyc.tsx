@@ -99,7 +99,7 @@ const StepEditKYC: React.FC<any> = (props) => {
     const ekycId = stateAuthentication?.ekycId || '';
     const resurl = {
       fullName: values.fullName,
-      fullAddress: `${values?.addressLine}, ${values?.precinct} - ${values?.district} - ${values?.city}`,
+      fullAddress: `${values?.addressLine || ''}, ${values?.precinct} - ${values?.district} - ${values?.city}`,
       uniqueId: '1',
       uniqueValue: values.uniqueValue,
       dateOfIssue: values.dateOfIssue,
@@ -122,6 +122,7 @@ const StepEditKYC: React.FC<any> = (props) => {
         actionStepper.nextStep();
         actionStepper.setCurrentPathStep(RoutesString.StepThreeOne);
         actionStoreAPI.setFetching(false);
+        return;
       }
 
       actionStoreAPI.setFetching(false);

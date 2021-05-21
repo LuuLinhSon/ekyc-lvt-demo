@@ -210,8 +210,12 @@ const redirectPage = (actionAuthentication: any, actionStepper: any, history: an
     }
     case 'OCR_BACK_IMAGE':
       return actionAuthentication.setActionError('OCR_BACK_IMAGE');
-    default:
+    default: {
+      actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
+      history.push(RoutesString.StepTwoTwo);
+      actionAuthentication.setActionError('ALL');
       return;
+    }
   }
 };
 
