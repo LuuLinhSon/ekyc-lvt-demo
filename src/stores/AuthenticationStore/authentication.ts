@@ -120,10 +120,11 @@ export const actions = {
       }
     },
   login:
-    (values: any, alert: any) =>
+    (values: any, alert: any, actionStoreAPI: any) =>
     async ({ setState, getState }: StoreApi) => {
       const prevState = getState();
       try {
+        actionStoreAPI.setFetching(true);
         const response = await requestLogin(values.phone, values.password);
         const resultCode = get(response, 'body.resultCode', '');
         if (resultCode === '0') {
@@ -173,6 +174,8 @@ export const actions = {
           ...prevState,
           loggedIn: false,
         });
+      } finally {
+        actionStoreAPI.setFetching(false);
       }
     },
 };

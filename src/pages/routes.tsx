@@ -7,6 +7,7 @@ import { positions, Provider } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
 import RoutesString, { Pages } from './routesString';
 import PrivateRoute from './privateRoute';
+import LoadingContainer from './loadingContainer';
 
 const options = {
   timeout: 5000,
@@ -16,6 +17,7 @@ const options = {
 const Routes: React.FC = (): JSX.Element => {
   return (
     <Provider template={AlertTemplate} {...options}>
+      <LoadingContainer />
       <Switch>
         <Route
           path={RoutesString.StepOne}

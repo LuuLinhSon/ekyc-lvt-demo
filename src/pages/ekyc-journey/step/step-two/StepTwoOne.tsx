@@ -12,6 +12,7 @@ import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { get, isEmpty, omit } from 'lodash';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import { useAlert } from 'react-alert';
+import { useStoreAPI } from 'api/storeAPI';
 
 const sha1 = require('js-sha1');
 
@@ -215,6 +216,7 @@ const redirectPage = (actionAuthentication: any, actionStepper: any, history: an
 };
 
 const StepTwoScreenshot: React.FC<any> = (props) => {
+  const [, actionStoreAPI] = useStoreAPI();
   const webcamRef = useRef<Webcam>(null);
   const [stateStepper, actionStepper] = useStepperStore();
   const [stateAuthentication, actionAuthentication] = useAuthentication();
@@ -247,6 +249,7 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     const base64 = imageSrc?.split(',')[1] || '';
 
     try {
+      actionStoreAPI.setFetching(true);
       const initEKYCResponse = await initEKYC(stateAuthentication);
       const ekycId = get(initEKYCResponse, 'body.ekycId', '');
       const paramsNumberVerify = get(initEKYCResponse, 'body.params', []).find(
@@ -310,7 +313,10 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
       actionAuthentication.setActionError(isEmpty(actionError) ? null : actionError);
 
       return alert.error(resultDesc);
-    } catch (e) {}
+    } catch (e) {
+    } finally {
+      actionStoreAPI.setFetching(false);
+    }
   };
 
   const captureBack = async () => {
@@ -318,6 +324,7 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     const base64 = imageSrc?.split(',')[1] || '';
     const ekycId = stateAuthentication?.ekycId || '';
     try {
+      actionStoreAPI.setFetching(true);
       const ocrBackEKYCResponse = await ocrBackEKYC(base64, ekycId, stateAuthentication);
       const resultCode = get(ocrBackEKYCResponse, 'body.resultCode', '');
       const resultDesc = get(ocrBackEKYCResponse, 'body.resultDesc', '');
@@ -365,7 +372,10 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
       await redirectPage(actionAuthentication, actionStepper, history, actionError);
 
       return alert.error(resultDesc);
-    } catch (e) {}
+    } catch (e) {
+    } finally {
+      actionStoreAPI.setFetching(false);
+    }
   };
 
   return (

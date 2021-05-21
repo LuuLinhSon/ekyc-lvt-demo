@@ -18,6 +18,7 @@ import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationT
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { useTimer } from 'use-timer';
 import { useAlert } from 'react-alert';
+import { useStoreAPI } from 'api/storeAPI';
 const sha1 = require('js-sha1');
 
 const WIDTH = 420;
@@ -142,6 +143,7 @@ const getStepContent = (numberImg: number) => {
 
 const StepThree: React.FC<any> = (props) => {
   const history = useHistory();
+  const [, actionStoreAPI] = useStoreAPI();
   const [stateAuthentication] = useAuthentication();
   const [, actionStepper] = useStepperStore();
   const [imgsrc, setImgSrc] = useState<SourceLive[]>([]);
@@ -244,6 +246,7 @@ const StepThree: React.FC<any> = (props) => {
       };
 
       try {
+        actionStoreAPI.setFetching(true);
         const verifyEKYCResponse = await verifyEKYC(audioLive, imgsrc, ekycId, stateAuthentication);
         const resultCode = get(verifyEKYCResponse, 'body.resultCode', '');
         const resultDesc = get(verifyEKYCResponse, 'body.resultDesc', '');
@@ -251,10 +254,12 @@ const StepThree: React.FC<any> = (props) => {
           history.push(RoutesString.StepFour);
           actionStepper.setCurrentPathStep(RoutesString.StepFour);
           actionStepper.nextStep();
+          actionStoreAPI.setFetching(false);
         }
         setImgSrc([]);
         setIsCheckFaceNear(false);
         reset();
+        actionStoreAPI.setFetching(false);
         alert.error(resultDesc);
       } catch (e) {}
     };

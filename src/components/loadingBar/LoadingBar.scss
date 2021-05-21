@@ -1,0 +1,73 @@
+@import 'styles/variables.scss';
+
+.loading-bar-container {
+  text-align: center;
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.progress-text {
+  padding-top: 10px;
+  display: inline-block;
+}
+
+.progress-line,
+.progress-line::before {
+  height: 3px;
+  width: 100%;
+  margin: 0;
+}
+
+.progress-line {
+  background-color: rgba($primary, 0.1);
+  display: -webkit-flex;
+  display: flex;
+  position: absolute;
+  z-index: 9999;
+}
+
+.progress-line::before {
+  background-color: $primary;
+  content: '';
+  -webkit-animation: running-progress 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: running-progress 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@-webkit-keyframes running-progress {
+  0% {
+    margin-left: 0;
+    margin-right: 100%;
+  }
+
+  50% {
+    margin-left: 25%;
+    margin-right: 0%;
+  }
+
+  100% {
+    margin-left: 100%;
+    margin-right: 0;
+  }
+}
+
+@keyframes running-progress {
+  0% {
+    margin-left: 0;
+    margin-right: 100%;
+  }
+
+  50% {
+    margin-left: 25%;
+    margin-right: 0%;
+  }
+
+  100% {
+    margin-left: 100%;
+    margin-right: 0;
+  }
+}

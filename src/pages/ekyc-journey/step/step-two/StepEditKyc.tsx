@@ -8,6 +8,7 @@ import { useAlert } from 'react-alert';
 import RoutesString from 'pages/routesString';
 import useStepperStore from 'stores/StepperStore/stepper';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useStoreAPI } from 'api/storeAPI';
 
 const YYYYMMDDHHMMSS = () => {
   const date = new Date();
@@ -80,6 +81,7 @@ const ocrEditEKYC = async (dataInfo: {}, ekycId: string, stateAuthentication: Au
 };
 
 const StepEditKYC: React.FC<any> = (props) => {
+  const [, actionStoreAPI] = useStoreAPI();
   const history = useHistory();
   const location = useLocation();
   const [stateStepper, actionStepper] = useStepperStore();
@@ -105,11 +107,12 @@ const StepEditKYC: React.FC<any> = (props) => {
       birthDate: values.birthDate,
       gender: values.gender,
       email: values.email,
-      placeId: '',
+      placeId: '240',
       addressLine: values.addressLine,
     };
 
     try {
+      actionStoreAPI.setFetching(true);
       const editKYCResponse = await ocrEditEKYC(resurl, ekycId, stateAuthentication);
       const resultCode = get(editKYCResponse, 'body.resultCode', '');
       const resultDesc = get(editKYCResponse, 'body.resultDesc', '');
@@ -118,8 +121,10 @@ const StepEditKYC: React.FC<any> = (props) => {
         history.push(RoutesString.StepThreeOne);
         actionStepper.nextStep();
         actionStepper.setCurrentPathStep(RoutesString.StepThreeOne);
+        actionStoreAPI.setFetching(false);
       }
 
+      actionStoreAPI.setFetching(false);
       return alert.error(resultDesc);
     } catch (e) {}
   };
