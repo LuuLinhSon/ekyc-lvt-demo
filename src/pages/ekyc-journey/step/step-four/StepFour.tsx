@@ -1,24 +1,45 @@
 import { Button } from '@material-ui/core';
 import React from 'react';
+import CMND_CCCD from 'assets/images/cmnd.png';
+import './StepFour.scss';
+import { useHistory, withRouter } from 'react-router-dom';
+import RoutesString from 'pages/routesString';
+import useStepperStore from 'stores/StepperStore/stepper';
 
 const StepFour: React.FC<any> = (props) => {
-  const finish = () => {};
-
-  const backToStep = () => {
-    props.goToStep(3);
-    props.handleBack();
+  const history = useHistory();
+  // const location = useLocation();
+  const [, actionStepper] = useStepperStore();
+  const nextToStep = () => {
+    history.push(RoutesString.StepTwoTwo);
+    actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
   };
+
+  // useEffect(() => {
+  //   const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+  //   if (isCurrentPage) return;
+  //   history.push(stateStepper.currentPathStep);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
   return (
-    <div>
-      <span>Step 4</span>
-      <Button variant="contained" color="primary" onClick={finish}>
-        Finish
-      </Button>
-      <Button variant="contained" color="primary" onClick={backToStep}>
-        Back
+    <div className="container">
+      <div className="d-flex justify-content-center mb-5">Chúc mừng quý khách đã xác thực thành công</div>
+      <span className="heading-title">HƯỚNG DẪN</span>
+      <span className="heading-title">Chụp ảnh Chứng minh thư/Thẻ căn cước</span>
+      <div className="description-container">
+        <ul>
+          <li>Giấy tờ còn hạn là sử dụng. Là hình gốc, không scan và photocopy</li>
+          <li>Chụp ảnh trong môi trường đủ sáng</li>
+          <li>Đảm bảo ảnh rõ nét, không bị mờ loá</li>
+        </ul>
+        <img src={CMND_CCCD} className="d-block" alt="LOGO_ALT" height="200" width="100%" />
+      </div>
+      <Button className="next-button" variant="contained" color="primary" onClick={nextToStep}>
+        Tiếp tục
       </Button>
     </div>
   );
 };
 
-export default StepFour;
+export default withRouter(StepFour);
