@@ -45,7 +45,7 @@ export const requestLogin = async (phone: string, password: string) => {
     'Access-Control-Allow-Origin': '*',
   };
   const response = await API({
-    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
     method: 'POST',
     headers,
     data: {

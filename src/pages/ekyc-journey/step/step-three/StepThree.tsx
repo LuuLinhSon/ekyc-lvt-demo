@@ -90,7 +90,7 @@ const verifyEKYC = async (
     'Access-Control-Allow-Origin': '*',
   };
   const verifyKYCResponse = await API({
-    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
     method: 'POST',
     headers,
     data: {
