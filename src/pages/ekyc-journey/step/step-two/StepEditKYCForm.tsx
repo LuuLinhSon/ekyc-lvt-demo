@@ -1,43 +1,49 @@
-import { Button, TextField } from '@material-ui/core';
+import { Button, FormControl, FormHelperText, MenuItem, Select, TextField } from '@material-ui/core';
 import { Form, withFormik, FormikBag } from 'formik';
+import { get, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import './StepEditKycForm.scss';
 
 const EditKYCForm: React.FC<any> = (props) => {
-  const { values, handleSubmit, setFieldValue, setValues } = props;
+  const { values, handleSubmit, setFieldValue, setValues, errors } = props;
   const [stateAuthentication] = useAuthentication();
 
   const userInformation = stateAuthentication?.ocrInformation;
   const [validation, setValidation] = useState({
     uniqueValue: {
       error: userInformation.idConfidence,
-      textError: 'Vui lòng kiểm tra lại',
+      textError: userInformation.idConfidence ? 'Vui lòng kiểm tra lại' : '',
     },
     dateOfIssue: {
       error: userInformation.issueDateConfidence,
-      textError: 'Vui lòng kiểm tra lại',
+      textError: userInformation.issueDateConfidence ? 'Vui lòng kiểm tra lại' : '',
     },
     placeOfIssue: {
       error: userInformation.signConfidence,
-      textError: 'Vui lòng kiểm tra lại',
+      textError: userInformation.signConfidence ? 'Vui lòng kiểm tra lại' : '',
     },
     gender: {
       error: userInformation.sexConfidence,
-      textError: 'Vui lòng kiểm tra lại',
+      textError: userInformation.sexConfidence ? 'Vui lòng kiểm tra lại' : '',
     },
     birthDate: {
       error: userInformation.brithDayConfidence,
-      textError: 'Vui lòng kiểm tra lại',
+      textError: userInformation.brithDayConfidence ? 'Vui lòng kiểm tra lại' : '',
     },
     city: {
       error: userInformation.provinceConfidence,
-      textError: 'Vui lòng kiểm tra lại',
+      textError: userInformation.provinceConfidence ? 'Vui lòng kiểm tra lại' : '',
     },
   });
 
   const onHandleChange = (name: string, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFieldValue(name, event.currentTarget.value);
+  };
+
+  const onHandleChangeDropdown = (name: string, event: any) => {
+    console.log('event', event);
+    setFieldValue(name, event.target.value);
   };
 
   const onBlur = (name: string, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -52,24 +58,23 @@ const EditKYCForm: React.FC<any> = (props) => {
 
   useEffect(() => {
     setValues({
-      fullName: userInformation?.name,
-      uniqueValue: userInformation?.id,
-      dateOfIssue: userInformation?.issueDate,
-      placeOfIssue: userInformation?.sign,
-      birthDate: userInformation?.brithDay,
-      gender: userInformation?.sex,
+      fullName: get(userInformation, 'name', ''),
+      uniqueValue: get(userInformation, 'id', ''),
+      dateOfIssue: get(userInformation, 'issueDate', ''),
+      placeOfIssue: get(userInformation, 'sign', ''),
+      birthDate: get(userInformation, 'brithDay', ''),
+      gender: get(userInformation, 'sex', ''),
       email: '',
-      addressLine: userInformation?.provinceDetail?.street,
-      city: userInformation?.provinceDetail?.city,
-      district: userInformation?.provinceDetail?.district,
-      precinct: userInformation?.provinceDetail?.precinct,
+      addressLine: get(userInformation, 'provinceDetail.street', ''),
+      city: get(userInformation, 'provinceDetail.city', ''),
+      district:get(userInformation, 'provinceDetail.district', ''),
+      precinct: get(userInformation, 'provinceDetail.precinct', ''),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const disabled: () => boolean = () => {
-    return values?.password === '' || values?.phone === '';
-  };
+  console.log('errors', errors);
+  
 
   return (
     <Form>
@@ -91,8 +96,8 @@ const EditKYCForm: React.FC<any> = (props) => {
             name="uniqueValue"
             onFocus={(e) => onBlur('uniqueValue', e)}
             onChange={(e) => onHandleChange('uniqueValue', e)}
-            error={validation?.uniqueValue?.error}
-            helperText={validation?.uniqueValue?.textError}
+            error={validation?.uniqueValue?.error || errors.uniqueValue === 'Required'}
+            helperText={validation?.uniqueValue?.textError || errors.uniqueValue}
           />
           <div className="block-row">
             <div className="w-50 pr-2">
@@ -106,8 +111,8 @@ const EditKYCForm: React.FC<any> = (props) => {
                 name="dateOfIssue"
                 onChange={(e) => onHandleChange('dateOfIssue', e)}
                 onFocus={(e) => onBlur('dateOfIssue', e)}
-                error={validation?.dateOfIssue?.error}
-                helperText={validation?.dateOfIssue?.textError}
+                error={validation?.dateOfIssue?.error || errors.dateOfIssue === 'Required'}
+                helperText={validation?.dateOfIssue?.textError || errors.dateOfIssue}
               />
             </div>
             <div className="w-50 pr-2">
@@ -121,26 +126,30 @@ const EditKYCForm: React.FC<any> = (props) => {
                 name="placeOfIssue"
                 onChange={(e) => onHandleChange('placeOfIssue', e)}
                 onFocus={(e) => onBlur('placeOfIssue', e)}
-                error={validation?.placeOfIssue?.error}
-                helperText={validation?.placeOfIssue?.textError}
+                error={validation?.placeOfIssue?.error || errors.placeOfIssue === 'Required'}
+                helperText={validation?.placeOfIssue?.textError || errors.placeOfIssue}
               />
             </div>
           </div>
           <div className="block-row">
             <div className="w-50 pr-2">
               <span className="field-name mt-5">Giới tính</span>
-              <TextField
-                value={values?.gender}
-                required={true}
-                className="text-field"
-                id="gender"
-                variant="outlined"
-                name="gender"
-                onChange={(e) => onHandleChange('gender', e)}
-                onFocus={(e) => onBlur('gender', e)}
-                error={validation?.gender?.error}
-                helperText={validation?.gender?.textError}
-              />
+              <FormControl variant="outlined" fullWidth={true} error={validation?.gender?.error || errors.gender === 'Required'}>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="demo-simple-select-outlined"
+                  value={values?.gender}
+                  onChange={(e) => onHandleChangeDropdown('gender', e)}
+                  label="Age"
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={'Nam'}>Nam</MenuItem>
+                  <MenuItem value={'Nữ'}>Nữ</MenuItem>
+                </Select>
+                <FormHelperText>{validation?.gender?.textError || errors.gender}</FormHelperText>
+              </FormControl>
             </div>
             <div className="w-50 pr-2">
               <span className="field-name mt-5">Ngày sinh</span>
@@ -153,8 +162,8 @@ const EditKYCForm: React.FC<any> = (props) => {
                 name="birthDate"
                 onChange={(e) => onHandleChange('birthDate', e)}
                 onFocus={(e) => onBlur('birthDate', e)}
-                error={validation?.birthDate?.error}
-                helperText={validation?.birthDate?.textError}
+                error={validation?.birthDate?.error || errors.birthDate === 'Required'}
+                helperText={validation?.birthDate?.textError || errors.birthDate}
               />
             </div>
           </div>
@@ -181,8 +190,8 @@ const EditKYCForm: React.FC<any> = (props) => {
             name="city"
             onChange={(e) => onHandleChange('city', e)}
             onFocus={(e) => onBlur('city', e)}
-            error={validation?.city?.error}
-            helperText={validation?.city?.textError}
+            error={validation?.city?.error || errors.city === 'Required'}
+            helperText={validation?.city?.textError || errors.city}
           />
           <div className="block-row">
             <div className="w-50 pr-2">
@@ -195,6 +204,8 @@ const EditKYCForm: React.FC<any> = (props) => {
                 variant="outlined"
                 name="district"
                 onChange={(e) => onHandleChange('district', e)}
+                error={errors.district === 'Required'}
+                helperText={errors.district}
               />
             </div>
             <div className="w-50 pr-2">
@@ -207,6 +218,8 @@ const EditKYCForm: React.FC<any> = (props) => {
                 variant="outlined"
                 name="precinct"
                 onChange={(e) => onHandleChange('precinct', e)}
+                error={errors.precinct === 'Required'}
+                helperText={errors.precinct}
               />
             </div>
           </div>
@@ -227,7 +240,7 @@ const EditKYCForm: React.FC<any> = (props) => {
           `}</span>
         </div>
         <Button
-          disabled={disabled()}
+          disabled={!isEmpty(errors)}
           className="next-button"
           variant="contained"
           color="primary"
@@ -264,6 +277,36 @@ const StepEditKYCForm = withFormik<any, any>({
     district: '',
     precinct: '',
   }),
+  validate: values => {
+    const errors: any = {};
+
+    if (values.uniqueValue === '') {
+      errors.uniqueValue = 'Required';
+    }
+    if (values.dateOfIssue === '') {
+      errors.dateOfIssue = 'Required';
+    }
+    if (values.placeOfIssue === '') {
+      errors.placeOfIssue = 'Required';
+    }
+    if (values.birthDate === '') {
+      errors.birthDate = 'Required';
+    }
+    if (values.gender === '') {
+      errors.gender = 'Required';
+    }
+    if (values.city === '') {
+      errors.city = 'Required';
+    }
+    if (values.district === '') {
+      errors.district = 'Required';
+    }
+    if (values.precinct === '') {
+      errors.precinct = 'Required';
+    }
+
+    return errors;
+  },
   handleSubmit: onSubmit,
 })(EditKYCForm);
 

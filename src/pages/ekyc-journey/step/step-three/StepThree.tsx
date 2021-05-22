@@ -304,7 +304,7 @@ const StepThree: React.FC<any> = (props) => {
     const imageSrc = webcamRef?.current?.getScreenshot();
     const base64 = imageSrc?.split(',')[1] || '';
     const imgLive = {
-      label: imgsrc.length === 0 ? 'far_face' : 'portrait',
+      label: imgsrc.length === 0 ? 'far' : 'near',
       base64,
       secureHash: sha1(base64),
     };
