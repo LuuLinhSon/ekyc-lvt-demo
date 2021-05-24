@@ -2,12 +2,99 @@ import { Button, FormControl, FormHelperText, MenuItem, Select, TextField } from
 import { Form, withFormik, FormikBag } from 'formik';
 import { get, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
+import API from 'api';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
+import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import './StepEditKycForm.scss';
+import { useStoreAPI } from 'api/storeAPI';
+
+const convertDateInput = (date: string) => {
+  const [day, month, year] = date.split('/');
+
+  return `${year}-${month}-${day}`;
+};
+
+const YYYYMMDDHHMMSS = () => {
+  const date = new Date();
+  const yyyy = date.getFullYear().toString();
+  const MM = pad(date.getMonth() + 1, 2);
+  const dd = pad(date.getDate(), 2);
+  const hh = pad(date.getHours(), 2);
+  const mm = pad(date.getMinutes(), 2);
+  const ss = pad(date.getSeconds(), 2);
+  const ms = pad(date.getMilliseconds(), 3);
+
+  return `${yyyy}${MM}${dd}${hh}${mm}${ss}.${ms}`;
+};
+
+const getDate = () => {
+  return YYYYMMDDHHMMSS();
+};
+
+const pad = (num: any, length: any) => {
+  let str = `${num}`;
+  while (str.length < length) {
+    str = `0${str}`;
+  }
+  return str;
+};
+
+export const getListArea = async (stateAuthentication: AuthenticationStates) => {
+  const timestamp = new Date().getTime();
+  const clientTime = getDate();
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+  };
+  const listAreaResponse = await API({
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
+    method: 'POST',
+    headers,
+    data: {
+      clientHeader: {
+        language: 'VN',
+        clientRequestId: `${timestamp}`,
+        deviceId: 'TESTDEMO',
+        clientAddress: '192.168.201.140',
+        platform: 'LOCAL',
+        function: 'getListArea',
+      },
+      body: {
+        header: {
+          platform: 'LOCAL',
+          clientRequestId: `${timestamp}`,
+          clientTime,
+          zonedClientTime: `${timestamp}`,
+          channelCode: 'WEBVIVIET',
+          deviceId: 'TESTDEMO',
+          sessionId: stateAuthentication.session.sessionId,
+          userId: stateAuthentication.session.userId,
+          authorizedMode: 0,
+          checkerMode: 0,
+          ip: '192.168.201.140',
+          makerId: 'SONLL',
+          language: 'VN',
+        },
+      },
+    },
+  });
+
+  return listAreaResponse;
+};
+
+const getParentCode = (parentValue: string, listParent: any, forDistrict: boolean) => {
+  const parent: any = listParent.find((item: any) => forDistrict ? item.provinceName === parentValue : item.districtName === parentValue);  
+  return parent?.areaCode;
+}
 
 const EditKYCForm: React.FC<any> = (props) => {
   const { values, handleSubmit, setFieldValue, setValues, errors } = props;
   const [stateAuthentication] = useAuthentication();
+  const [, actionStoreAPI] = useStoreAPI();
+  const [listCity, setListCity] = useState([]);
+  const [listDistrict, setListDistrict] = useState([]);
+  const [listPrecinct, setListPrecinct] = useState([]);
+  const [currentCityCode, setCurrentCityCode] = useState(null);
+  const [currentDistrictCode, setCurrentDistrictCode] = useState(null);
 
   const userInformation = stateAuthentication?.ocrInformation;
   const [validation, setValidation] = useState({
@@ -42,7 +129,15 @@ const EditKYCForm: React.FC<any> = (props) => {
   };
 
   const onHandleChangeDropdown = (name: string, event: any) => {
-    console.log('event', event);
+    if(name === 'city') {
+      setFieldValue('district', '');
+      setFieldValue('precinct', '');
+    }
+
+    if(name === 'district') {
+      setFieldValue('precinct', '');
+    }
+
     setFieldValue(name, event.target.value);
   };
 
@@ -57,24 +152,42 @@ const EditKYCForm: React.FC<any> = (props) => {
   };
 
   useEffect(() => {
+    const initForm = async function () {
+      actionStoreAPI.setFetching(true);
+      const response = await getListArea(stateAuthentication);
+      actionStoreAPI.setFetching(false);
+      const listArea = get(response, 'body.area', []);
+      const listCity = listArea.filter((item) => item.areaType === 'P');
+      const listDistrict = listArea.filter((item) => item.areaType === 'D');
+      const listPrecinct = listArea.filter((item) => item.areaType === 'C');
+      setListCity(listCity);
+      setListDistrict(listDistrict);
+      setListPrecinct(listPrecinct); 
+      setCurrentCityCode(getParentCode(get(userInformation, 'provinceDetail.city', ''), listCity, true));
+      setCurrentDistrictCode(getParentCode(get(userInformation, 'provinceDetail.district', ''), listDistrict, false));
+    };
+    initForm();
     setValues({
       fullName: get(userInformation, 'name', ''),
       uniqueValue: get(userInformation, 'id', ''),
-      dateOfIssue: get(userInformation, 'issueDate', ''),
+      dateOfIssue: convertDateInput(get(userInformation, 'issueDate', '')),
       placeOfIssue: get(userInformation, 'sign', ''),
-      birthDate: get(userInformation, 'brithDay', ''),
+      birthDate: convertDateInput(get(userInformation, 'brithDay', '')),
       gender: get(userInformation, 'sex', ''),
       email: '',
       addressLine: get(userInformation, 'provinceDetail.street', ''),
       city: get(userInformation, 'provinceDetail.city', ''),
-      district:get(userInformation, 'provinceDetail.district', ''),
+      district: get(userInformation, 'provinceDetail.district', ''),
       precinct: get(userInformation, 'provinceDetail.precinct', ''),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log('errors', errors);
-  
+  useEffect(() => {
+    setCurrentCityCode(getParentCode(values.city, listCity, true));
+    setCurrentDistrictCode(getParentCode(values.district, listDistrict, false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);  
 
   return (
     <Form>
@@ -106,6 +219,7 @@ const EditKYCForm: React.FC<any> = (props) => {
                 value={values?.dateOfIssue}
                 required={true}
                 className="text-field"
+                type="date"
                 id="dateOfIssue"
                 variant="outlined"
                 name="dateOfIssue"
@@ -157,6 +271,7 @@ const EditKYCForm: React.FC<any> = (props) => {
                 value={values?.birthDate}
                 required={true}
                 className="text-field"
+                type="date"
                 id="birthDate"
                 variant="outlined"
                 name="birthDate"
@@ -181,46 +296,69 @@ const EditKYCForm: React.FC<any> = (props) => {
             <span className="header-container-header-text font-weight-bold">Địa chỉ thường trú</span>
           </div>
           <span className="field-name mt-3">Tỉnh/Thành phố</span>
-          <TextField
-            value={values?.city}
-            required={true}
-            className="text-field"
-            id="city"
-            variant="outlined"
-            name="city"
-            onChange={(e) => onHandleChange('city', e)}
-            onFocus={(e) => onBlur('city', e)}
-            error={validation?.city?.error || errors.city === 'Required'}
-            helperText={validation?.city?.textError || errors.city}
-          />
+          <FormControl variant="outlined" fullWidth={true} error={validation?.city?.error || errors.city === 'Required'}>
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="city"
+              value={values?.city}
+              onChange={(e) => onHandleChangeDropdown('city', e)}
+              label="Thành phố"
+              name="city"
+              onFocus={(e) => onBlur('city', e)}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {listCity.map((item: any, idx: number) => {
+                return <MenuItem key={idx} value={item.provinceName}>{item.provinceName}</MenuItem>
+              })}
+            </Select>
+            <FormHelperText>{validation?.city?.textError || errors.city}</FormHelperText>
+          </FormControl>
           <div className="block-row">
             <div className="w-50 pr-2">
               <span className="field-name mt-5">Quận/Huyện</span>
-              <TextField
-                value={values?.district}
-                required={true}
-                className="text-field"
-                id="district"
-                variant="outlined"
-                name="district"
-                onChange={(e) => onHandleChange('district', e)}
-                error={errors.district === 'Required'}
-                helperText={errors.district}
-              />
+              <FormControl variant="outlined" fullWidth={true} error={errors.district === 'Required'}>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="district"
+                  value={values?.district}
+                  onChange={(e) => onHandleChangeDropdown('district', e)}
+                  label="Quận huyện"
+                  name="district"
+                  onFocus={(e) => onBlur('district', e)}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {values?.city !== '' && listDistrict.filter((item: any) => item.parentCode === currentCityCode).map((item: any, idx: number) => {
+                    return <MenuItem key={idx} value={item.districtName}>{item.districtName}</MenuItem>
+                  })}
+                </Select>
+                <FormHelperText>{errors.district}</FormHelperText>
+              </FormControl>
             </div>
             <div className="w-50 pr-2">
               <span className="field-name mt-5">Phường/Xã</span>
-              <TextField
-                value={values?.precinct}
-                required={true}
-                className="text-field"
-                id="precinct"
-                variant="outlined"
-                name="precinct"
-                onChange={(e) => onHandleChange('precinct', e)}
-                error={errors.precinct === 'Required'}
-                helperText={errors.precinct}
-              />
+              <FormControl variant="outlined" fullWidth={true} error={errors.precinct === 'Required'}>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="precinct"
+                  value={values?.precinct}
+                  onChange={(e) => onHandleChangeDropdown('precinct', e)}
+                  label="Phường xã"
+                  name="precinct"
+                  onFocus={(e) => onBlur('precinct', e)}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {values?.district !== '' && listPrecinct.filter((item: any) => item.parentCode === currentDistrictCode).map((item: any, idx: number) => {
+                    return <MenuItem key={idx} value={item.precinctName}>{item.precinctName}</MenuItem>
+                  })}
+                </Select>
+                <FormHelperText>{errors.precinct}</FormHelperText>
+              </FormControl>
             </div>
           </div>
           <span className="field-name mt-3">Nhập địa chỉ cụ thể</span>

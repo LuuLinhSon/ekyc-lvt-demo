@@ -35,7 +35,7 @@ const pad = (num: any, length: any) => {
   return str;
 };
 
-const ocrEditEKYC = async (dataInfo: {}, ekycId: string, stateAuthentication: AuthenticationStates) => {
+export const ocrEditEKYC = async (dataInfo: {}, ekycId: string, stateAuthentication: AuthenticationStates) => {
   const timestamp = new Date().getTime();
   const clientTime = getDate();
   const headers = {
@@ -80,6 +80,12 @@ const ocrEditEKYC = async (dataInfo: {}, ekycId: string, stateAuthentication: Au
   return ocrFrontResponse;
 };
 
+const convertDateOutput = (date: string) => {
+  const [year, month, day] = date.split('-');
+
+  return `${day}/${month}/${year}`;
+};
+
 const StepEditKYC: React.FC<any> = (props) => {
   const [, actionStoreAPI] = useStoreAPI();
   const history = useHistory();
@@ -102,14 +108,17 @@ const StepEditKYC: React.FC<any> = (props) => {
       fullAddress: `${values?.addressLine || ''}, ${values?.precinct} - ${values?.district} - ${values?.city}`,
       uniqueId: '1',
       uniqueValue: values.uniqueValue,
-      dateOfIssue: values.dateOfIssue,
+      dateOfIssue: convertDateOutput(values.dateOfIssue),
       placeOfIssue: values.placeOfIssue,
-      birthDate: values.birthDate,
+      birthDate: convertDateOutput(values.birthDate),
       gender: values.gender,
       email: values.email,
       placeId: '240',
       addressLine: values.addressLine,
     };
+
+    console.log('resurl form', resurl);
+    
 
     try {
       actionStoreAPI.setFetching(true);

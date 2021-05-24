@@ -127,6 +127,7 @@ export const actions = {
         actionStoreAPI.setFetching(true);
         const response = await requestLogin(values.phone, values.password);
         const resultCode = get(response, 'body.resultCode', '');
+        const resultDesc = get(response, 'body.resultDesc', '');
         if (resultCode === '0') {
           setState({
             ...prevState,
@@ -168,12 +169,15 @@ export const actions = {
           loggedIn: false,
         });
 
-        return alert.error('Thông tin đăng nhập không đúng');
+        alert.error(resultDesc);
+
+        return;
       } catch (e) {
         setState({
           ...prevState,
           loggedIn: false,
         });
+        alert.error('Đã xảy ra lỗi vui lòng thử lại');
       } finally {
         actionStoreAPI.setFetching(false);
       }
