@@ -115,10 +115,7 @@ const StepEditKYC: React.FC<any> = (props) => {
       email: values.email,
       placeId: '240',
       addressLine: values.addressLine,
-    };
-
-    console.log('resurl form', resurl);
-    
+    };    
 
     try {
       actionStoreAPI.setFetching(true);

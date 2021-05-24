@@ -372,14 +372,38 @@ const StepThree: React.FC<any> = (props) => {
         }}
       >
         {imgsrc.length === 2 ? (
-          <div className="list-images-wrapper">
-            {numberVerifyList?.map((num, inx) => {
-              return (
-                <div className="number-item" key={inx}>
-                  {num}
-                </div>
-              );
-            })}
+          <div className="wrapper">
+            <div className="list-images-wrapper">
+              {numberVerifyList?.map((num, inx) => {
+                return (
+                  <div className="number-item" key={inx}>
+                    {num}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ position: 'relative', width: WIDTH }}>
+              <div style={{ position: 'absolute' }}>
+                <Webcam
+                  audio={false}
+                  width={WIDTH}
+                  height={HEIGHT}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={true}
+                />
+              </div>
+              {fullDesc ? (
+                <DrawBox
+                  checkFaceNear={null}
+                  fullDesc={fullDesc}
+                  screenshot={() => {}}
+                  imageWidth={WIDTH}
+                  boxColor={'blue'}
+                  notShowFrame={true}
+                />
+              ) : null}
+            </div>
           </div>
         ) : (
           <div style={{ position: 'relative', width: WIDTH }}>
