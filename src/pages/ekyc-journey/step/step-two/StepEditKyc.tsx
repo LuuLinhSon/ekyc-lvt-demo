@@ -111,7 +111,7 @@ const StepEditKYC: React.FC<any> = (props) => {
       dateOfIssue: convertDateOutput(values.dateOfIssue),
       placeOfIssue: values.placeOfIssue,
       birthDate: convertDateOutput(values.birthDate),
-      gender: values.gender,
+      gender: values.gender === 'Nam' ? '1' : '0',
       email: values.email,
       placeId: '240',
       addressLine: values.addressLine,
