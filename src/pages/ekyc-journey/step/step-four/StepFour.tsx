@@ -1,19 +1,19 @@
-// import { Button } from '@material-ui/core';
 import React, { useEffect, useRef, useState } from 'react';
-// import CMND_CCCD from 'assets/images/cmnd.png';
 import './StepFour.scss';
 import API from 'api';
 
-import { withRouter } from 'react-router-dom';
-// import { get } from 'lodash';
+import { useHistory, useLocation, withRouter } from 'react-router-dom';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
-// import useStringee from 'custom-hook/useScript';
-// import RoutesString from 'pages/routesString';
-// import useStepperStore from 'stores/StepperStore/stepper';
 import publicIp from "public-ip";
 import { get } from 'lodash';
-import { Button } from '@material-ui/core';
+import StepWizard from 'react-step-wizard';
+import CallVideo from './CallVideo';
+import InitialCall from './CallInitial';
+import useStepperStore from 'stores/StepperStore/stepper';
+import RoutesString from 'pages/routesString';
+import CallSuccess from './CallSuccess';
+
 
 const YYYYMMDDHHMMSS = () => {
   const date = new Date();
@@ -85,7 +85,7 @@ const getAccessToken = async (stateAuthentication: AuthenticationStates) => {
   return initEKYCResponse;
 };
 
-const settingClientEvents = (client, call, remoteVideo, localVideo) => {
+const settingClientEvents = (client, call, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction) => {
   client.on('connect', function () {
       console.log('++++++++++++++ connected to StringeeServer');
   });
@@ -100,11 +100,14 @@ const settingClientEvents = (client, call, remoteVideo, localVideo) => {
 
   client.on('custommessage', function(info) {
       console.log('on info:' + JSON.stringify(info));
+      const action = get(info, 'message.action', '');
+      setDataFromServer(get(info, 'message.payload', {}));
+      setAction(action);
   });
 
   client.on('incomingcall2', function (incomingcall2) {
       call = incomingcall2;
-      settingCallEvent(incomingcall2, remoteVideo, localVideo);
+      settingCallEvent(incomingcall2, remoteVideo, localVideo, setIsRingRing, setPrepareCall,setDataFromServer, setAction);
 
       call.ringing(function (res) {});
 
@@ -124,7 +127,7 @@ const callEnded = () => {
   console.log('CALL_ENDED');
 }
 
-const settingCallEvent = (call1, remoteVideo, localVideo, ) => {
+const settingCallEvent = (call1, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction) => {
   console.log('localVideo', localVideo);
   
   callStarted();
@@ -150,9 +153,14 @@ const settingCallEvent = (call1, remoteVideo, localVideo, ) => {
       console.log('signalingstate ', state);
       if (state.code === 6) {
           callEnded();
+          setAction('ENDED');
       } else if (state.code === 5) {
           callEnded();
-      }
+          setAction('ENDED');
+      } else if (state.code === 3) {
+        setIsRingRing(false);
+        setPrepareCall(false);
+    }
   });
 
   call1.on('mediastate', function (state) {
@@ -166,6 +174,7 @@ const settingCallEvent = (call1, remoteVideo, localVideo, ) => {
   call1.on('otherdevice', function (data) {
       console.log('on otherdevice:' + JSON.stringify(data));
       if ((data.type === 'CALL_STATE' && data.code >= 200) || data.type === 'CALL_END') {
+          setAction('ENDED')
           callEnded();
       }
   });
@@ -174,55 +183,65 @@ const settingCallEvent = (call1, remoteVideo, localVideo, ) => {
 const StepFour: React.FC<any> = (props) => {
   const global: any = window;
   let call: any = null;
+  const location = useLocation();
   const [stringeeClient] = useState<any>(new global.StringeeClient());
-  // const [isRingRing, setIsRingRing] = useState<boolean>(true);
+  const [isRingRing, setIsRingRing] = useState<boolean>(false);
+  const [prepareCall, setPrepareCall] = useState<boolean>(true);
+  const [dataFromServer, setDataFromServer] = useState(null);
+  const [action, setAction] = useState(false);
   const remoteVideo = useRef(null);
   const localVideo = useRef(null);
-  const [stateAuthentication] = useAuthentication();
-  // const history = useHistory();
-  // // const location = useLocation();
-  // const [, actionStepper] = useStepperStore();
-  // const nextToStep = () => {
-  //   history.push(RoutesString.StepTwoTwo);
-  //   actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
-  // };
+  const [stateAuthentication, actionAuthentication] = useAuthentication();
+  const [stateStepper, actionStepper] = useStepperStore();
+  const history = useHistory();
 
   useEffect(() => {
     const initVideoCall = async function () {
       const response = await getAccessToken(stateAuthentication);
       const accessToken = get(response, 'body.accessToken', '');
-      settingClientEvents(stringeeClient, call, remoteVideo, localVideo);
+      settingClientEvents(stringeeClient, call, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction);
       stringeeClient?.connect(accessToken);
     }
     initVideoCall();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+    if (isCurrentPage) return;
+    history.push(stateStepper.currentPathStep);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const makeCall = (videocall) => {
+    setIsRingRing(true);
     call = new global.StringeeCall2(stringeeClient, 'FROM_YOUR_NUMBER', 'user_2', videocall);
-    settingCallEvent(call, remoteVideo, localVideo);
+    settingCallEvent(call, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction);
 
     call.makeCall(function (res) {
         console.log('make call callback: ' + JSON.stringify(res));
     });
-}
+  }
+
+  const logout = async () => {
+    await actionAuthentication.logout();
+    await actionStepper.resetStepper();
+    history.push(RoutesString.StepOne, {});
+  };
+
+  const rejectCall = () => {
+    setPrepareCall(true);
+    setIsRingRing(false);
+    logout();
+  }  
 
   return (
     <div className="container">
-      <div className="d-flex justify-content-center mb-5">Chúc mừng quý khách đã xác thực thành công</div>
-
-      <div>
-      <Button
-        className="next-button"
-        variant="contained"
-        color="primary"
-        onClick={() => makeCall(true)}
-      >
-        Tiếp tục
-      </Button>
-        <video ref={remoteVideo} playsInline autoPlay muted style={{ width: 350, height: 350, backgroundColor: 'black' }}></video>
-        <video ref={localVideo} playsInline autoPlay style={{ width: 350, height: 350, backgroundColor: 'black' }}></video>
-      </div>
+      <StepWizard>
+        <InitialCall isRingRing={isRingRing} makeCall={makeCall} prepareCall={prepareCall}/>
+        <CallVideo remoteVideo={remoteVideo} localVideo={localVideo} dataFromServer={dataFromServer} rejectCall={rejectCall} action={action}/>
+        <CallSuccess action={action}/>
+      </StepWizard>
     </div>
   );
 };
