@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import withLayout from '../components/layout/withLayout';
+import ServiceLayout from '../components/layout/ServiceLayout/ServiceLayout';
 import AnonymousUserLayout from '../components/layout/AnonymousUserLayout/AnonymousUserLayout';
 import Spinner from 'components/spinner/Spinner';
 import { positions, Provider } from 'react-alert';
@@ -25,6 +26,24 @@ const Routes: React.FC = (): JSX.Element => {
           component={withLayout(AnonymousUserLayout, () => (
             <Suspense fallback={<Spinner />}>
               <Pages.StepOne />
+            </Suspense>
+          ))}
+        />
+        <Route
+          path={RoutesString.OrcFace}
+          exact={true}
+          component={withLayout(ServiceLayout, () => (
+            <Suspense fallback={<Spinner />}>
+              <Pages.OrcFace />
+            </Suspense>
+          ))}
+        />
+        <Route
+          path={RoutesString.FaceCompare}
+          exact={true}
+          component={withLayout(ServiceLayout, () => (
+            <Suspense fallback={<Spinner />}>
+              <Pages.FaceCompare />
             </Suspense>
           ))}
         />

@@ -7,6 +7,9 @@ import StepLabel from '@material-ui/core/StepLabel';
 
 import './AnonymousUserLayout.scss';
 import useStepperStore from 'stores/StepperStore/stepper';
+import { Button } from '@material-ui/core';
+import { useHistory } from 'react-router';
+import RoutesString from 'pages/routesString';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,11 +32,28 @@ const AnonymousUserLayout: React.FC = ({ children }) => {
   const classes = useStyles();
   const [stateStepper] = useStepperStore();
   const steps = getSteps();
+  const history = useHistory();
+
+  const toOrcFace = () => {
+    history.push(RoutesString.OrcFace);
+  }
+
+  const toFaceCompare = () => {
+    history.push(RoutesString.FaceCompare);
+  }
 
   return (
     <div className="full-screen anonymous-layout">
       <div className="anonymous-layout-content">
         <>
+          <div className="wrapper-button">
+          <Button className="action-button" variant="contained" color="primary" onClick={toOrcFace}>
+            OCR FACE
+          </Button>
+          <Button className="action-button" variant="contained" color="primary" onClick={toFaceCompare}>
+            FACE COMPARE
+          </Button>
+          </div>
           <div className="mt-5 mb-5">
             <div className="mb-4 d-flex justify-content-center">
               <img src={LVT_LOGO} className="d-block" alt="LOGO_ALT" height="50" />

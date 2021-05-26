@@ -20,6 +20,8 @@ export const PUBLIC_PAGES = {
     STEP_THREE_ONE: 'step-3-1',
     STEP_THREE_TWO: 'step-3-2',
     STEP_FOUR: 'step-4',
+    ORC_FACE: 'orc-face',
+    FACE_COMPARE: 'face-compare'
   },
 };
 
