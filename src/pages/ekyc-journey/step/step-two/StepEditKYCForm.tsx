@@ -86,6 +86,21 @@ const getParentCode = (parentValue: string, listParent: any, forDistrict: boolea
   return parent?.areaCode;
 }
 
+const mapCardTypeToValue = (cardType: string) => {
+  switch (cardType) {
+    case 'OLD ID': 
+      return 'CMND cũ';
+    case 'NEW ID': 
+      return 'CCCD mới';
+    case 'CHIP_ID':
+      return 'CCCD gắn chip';
+    case 'PASSPORT':
+      return 'Hộ Chiếu'; 
+    default: 
+      return '';
+  }
+}
+
 const EditKYCForm: React.FC<any> = (props) => {
   const { values, handleSubmit, setFieldValue, setValues, errors } = props;
   const [stateAuthentication] = useAuthentication();
@@ -158,8 +173,17 @@ const EditKYCForm: React.FC<any> = (props) => {
       actionStoreAPI.setFetching(false);
       const listArea = get(response, 'body.area', []);
       const listCity = listArea.filter((item) => item.areaType === 'P');
-      const listDistrict = listArea.filter((item) => item.areaType === 'D');
-      const listPrecinct = listArea.filter((item) => item.areaType === 'C');
+      const listDistrict = listArea.filter((item) => item.areaType === 'D').map((item) => {
+        return { ...item, districtName: item?.districtName?.replace('H.', '')}
+      });
+      const listPrecinct = listArea.filter((item) => item.areaType === 'C').map((item) => {
+        return { ...item, precinctName: item?.precinctName?.replace('Xã ', '')}
+      });;
+
+      console.log('listCity', listCity);
+      console.log('listDistrict', listDistrict);
+      console.log('listPrecinct', listPrecinct);
+      
       setListCity(listCity);
       setListDistrict(listDistrict);
       setListPrecinct(listPrecinct); 
@@ -168,6 +192,8 @@ const EditKYCForm: React.FC<any> = (props) => {
     };
     initForm();
     setValues({
+      address: get(userInformation, 'address', ''),
+      cardType: get(userInformation, 'cardType', ''),
       fullName: get(userInformation, 'name', ''),
       uniqueValue: get(userInformation, 'id', ''),
       dateOfIssue: convertDateInput(get(userInformation, 'issueDate', '')),
@@ -175,7 +201,7 @@ const EditKYCForm: React.FC<any> = (props) => {
       birthDate: convertDateInput(get(userInformation, 'brithDay', '')),
       gender: get(userInformation, 'sex', ''),
       email: '',
-      addressLine: get(userInformation, 'provinceDetail.street', ''),
+      addressLine: get(userInformation, 'provinceDetail.streetName', ''),
       city: get(userInformation, 'provinceDetail.city', ''),
       district: get(userInformation, 'provinceDetail.district', ''),
       precinct: get(userInformation, 'provinceDetail.precinct', ''),
@@ -199,6 +225,16 @@ const EditKYCForm: React.FC<any> = (props) => {
           <div className="header-container">
             <span className="header-container-header-text font-weight-bold">Thông tin cơ bản</span>
           </div>
+          <span className="field-name mt-3">Loại</span>
+          <TextField
+            value={mapCardTypeToValue(values?.cardType)}
+            required={true}
+            className="text-field"
+            id="cardType"
+            variant="outlined"
+            name="cardType"
+            onChange={(e) => onHandleChange('cardType', e)}
+          />
           <span className="field-name mt-3">Số chứng minh/Thẻ căn cước</span>
           <TextField
             value={values?.uniqueValue}
@@ -310,7 +346,7 @@ const EditKYCForm: React.FC<any> = (props) => {
                 <em>None</em>
               </MenuItem>
               {listCity.map((item: any, idx: number) => {
-                return <MenuItem key={idx} value={item.provinceName}>{item.provinceName}</MenuItem>
+                return <MenuItem key={idx} value={item.provinceName}>{`${item.provinceName}`}</MenuItem>
               })}
             </Select>
             <FormHelperText>{validation?.city?.textError || errors.city}</FormHelperText>
@@ -332,7 +368,7 @@ const EditKYCForm: React.FC<any> = (props) => {
                     <em>None</em>
                   </MenuItem>
                   {values?.city !== '' && listDistrict.filter((item: any) => item.parentCode === currentCityCode).map((item: any, idx: number) => {
-                    return <MenuItem key={idx} value={item.districtName}>{item.districtName}</MenuItem>
+                    return <MenuItem key={idx} value={item.districtName}>{`${item.districtName}`}</MenuItem>
                   })}
                 </Select>
                 <FormHelperText>{errors.district}</FormHelperText>
@@ -354,7 +390,7 @@ const EditKYCForm: React.FC<any> = (props) => {
                     <em>None</em>
                   </MenuItem>
                   {values?.district !== '' && listPrecinct.filter((item: any) => item.parentCode === currentDistrictCode).map((item: any, idx: number) => {
-                    return <MenuItem key={idx} value={item.precinctName}>{item.precinctName}</MenuItem>
+                    return <MenuItem key={idx} value={item.precinctName}>{`${item.precinctName}`}</MenuItem>
                   })}
                 </Select>
                 <FormHelperText>{errors.precinct}</FormHelperText>
@@ -370,6 +406,16 @@ const EditKYCForm: React.FC<any> = (props) => {
             variant="outlined"
             name="addressLine"
             onChange={(e) => onHandleChange('addressLine', e)}
+          />
+          <span className="field-name mt-3">Địa chỉ đầy đủ trên giấy tờ</span>
+          <TextField
+            value={values?.address}
+            required={true}
+            className="text-field"
+            id="address"
+            variant="outlined"
+            name="address"
+            onChange={(e) => onHandleChange('address', e)}
           />
 
           <span className="field-name mt-3">{`Địa chỉ đầy đủ: ${values?.addressLine || ''} ${values?.precinct} - ${
@@ -404,6 +450,8 @@ export const onSubmit = (values: any, { setErrors, props, setSubmitting }: Formi
 const StepEditKYCForm = withFormik<any, any>({
   enableReinitialize: true,
   mapPropsToValues: () => ({
+    address: '',
+    cardType: '',
     uniqueValue: '',
     dateOfIssue: '',
     placeOfIssue: '',

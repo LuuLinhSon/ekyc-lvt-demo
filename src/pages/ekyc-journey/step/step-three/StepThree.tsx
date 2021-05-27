@@ -233,7 +233,7 @@ const StepThree: React.FC<any> = (props) => {
               const verifyEKYCResponse = await verifyEKYC(audioLive, imgsrc, ekycId, stateAuthentication);
               const resultCode = get(verifyEKYCResponse, 'body.resultCode', '');
               const resultDesc = get(verifyEKYCResponse, 'body.resultDesc', '');
-              if (resultCode === '0') {
+              if (resultCode === '0' || resultCode === 'EKYC-0010') {
                 history.push(RoutesString.StepFour);
                 actionStepper.setCurrentPathStep(RoutesString.StepFour);
                 actionStepper.nextStep();

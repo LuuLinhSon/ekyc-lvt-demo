@@ -1,4 +1,4 @@
-import { Button, FormControl, FormControlLabel, makeStyles, MenuItem, Paper, Radio, RadioGroup, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Button, FormControlLabel, makeStyles, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import React, { useState } from 'react';
 import ImageUploading from 'react-images-uploading';
 import API from 'api';
@@ -105,27 +105,28 @@ interface RowFaceInterface {
 const OrcFace: React.FC<any> = (props) => {
   const classes = useStyles();
   const [radio, setRadio] = useState('cmnd');
-  const [stateOrc, setStateOrc] = useState('front');
-  const [document, setDocument] = useState('OLD_ID');
+  // const [stateOrc, setStateOrc] = useState('front');
+  // const [document, setDocument] = useState('OLD_ID');
   const [images, setImages] = useState([]);
   const [, actionStoreAPI] = useStoreAPI();
   const [rows, setRows] = useState<RowOrcInterface[] | []>([]);
   const [rowsFace, setRowsFace] = useState<RowFaceInterface[] | []>([]);
   const maxNumber = 69;
+
   const handleChange = (event: any) => {
     const value = event.target.value;
     setRadio(value);
   }
 
-  const handleChangeFrontBack = (event: any) => {
-    const value = event.target.value;
-    setStateOrc(value);
-  };
+  // const handleChangeFrontBack = (event: any) => {
+  //   const value = event.target.value;
+  //   setStateOrc(value);
+  // };
 
-  const handleChangeDocument = (event: any) => {
-    const value = event.target.value;
-    setDocument(value);
-  }
+  // const handleChangeDocument = (event: any) => {
+  //   const value = event.target.value;
+  //   setDocument(value);
+  // }
 
   const onChange = (imageList, addUpdateIndex) => {
     setImages(imageList);
@@ -144,7 +145,9 @@ const OrcFace: React.FC<any> = (props) => {
     try {
       actionStoreAPI.setFetching(true);
       const responseCheckOrc = await checkOrcImage(base64);
-      const responseCheckOrcQuality = await checkOrcQualityImage(base64, stateOrc === 'front', document);
+      const id = get(responseCheckOrc, 'id', '');
+      const document = get(responseCheckOrc, 'document', '').replaceAll(' ', '_');
+      const responseCheckOrcQuality = await checkOrcQualityImage(base64, id !== 'N/A', document);
       const isCorner = get(responseCheckOrc, 'id_check', '') === 'CORNER';
       const isPhotocopy = get(responseCheckOrc, 'id_check', '') === 'BW';
       const isFake = get(responseCheckOrc, 'id_check', '') === 'FAKE';
@@ -205,7 +208,7 @@ const OrcFace: React.FC<any> = (props) => {
               <FormControlLabel value="cmnd" control={<Radio />} label="CMND/CCCD" />
               <FormControlLabel value="face" control={<Radio />} label="Khuôn mặt" />
             </RadioGroup>
-            {
+            {/* {
               radio === 'cmnd' && 
               <div className="filter-wrapper">
                 <FormControl className="w-50 mr-2" variant="outlined">
@@ -247,7 +250,7 @@ const OrcFace: React.FC<any> = (props) => {
                   </Select>
                 </FormControl>
               </div>
-            }
+            } */}
             <ImageUploading
               multiple
               value={images}
