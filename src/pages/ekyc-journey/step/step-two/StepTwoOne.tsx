@@ -141,7 +141,7 @@ const ocrFrontEKYC = async (base64: string, ekycId: string, stateAuthentication:
 };
 
 const checkConfidence = (confidence: string) => {
-  return confidence === 'Y' ? true : false;
+  return confidence === 'Y' ? false : true;
 };
 
 const ocrBackEKYC = async (base64: string, ekycId: string, stateAuthentication: AuthenticationStates) => {
@@ -210,12 +210,8 @@ const redirectPage = (actionAuthentication: any, actionStepper: any, history: an
     }
     case 'OCR_BACK_IMAGE':
       return actionAuthentication.setActionError('OCR_BACK_IMAGE');
-    default: {
-      actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
-      history.push(RoutesString.StepTwoTwo);
-      actionAuthentication.setActionError('ALL');
+    default:
       return;
-    }
   }
 };
 
@@ -302,12 +298,14 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         (resultCode === '0' && stateAuthentication.actionError === 'ALL') ||
         (resultCode === '0' && stateAuthentication.actionError === null)
       ) {
+        actionAuthentication.setActionError(null);
         history.push(RoutesString.StepTwoThree);
         actionStepper.setCurrentPathStep(RoutesString.StepTwoThree);
         return;
       }
 
       if (resultCode === '0' && stateAuthentication.actionError === 'OCR_FRONT_IMAGE') {
+        actionAuthentication.setActionError(null);
         actionAuthentication.setOcrInformation(ocrInformationByType);
         history.push(RoutesString.StepEditKYC);
         actionStepper.setCurrentPathStep(RoutesString.StepEditKYC);
@@ -315,9 +313,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
       }
 
       actionAuthentication.setActionError(isEmpty(actionError) ? null : actionError);
-
-      return alert.error(resultDesc);
+      alert.error(resultDesc);
     } catch (e) {
+      alert.error('Đã xảy ra lỗi vui lòng thử lại');
     } finally {
       actionStoreAPI.setFetching(false);
     }
@@ -375,8 +373,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
 
       await redirectPage(actionAuthentication, actionStepper, history, actionError);
 
-      return alert.error(resultDesc);
+      alert.error(resultDesc);
     } catch (e) {
+      alert.error('Đã xảy ra lỗi vui lòng thử lại');
     } finally {
       actionStoreAPI.setFetching(false);
     }

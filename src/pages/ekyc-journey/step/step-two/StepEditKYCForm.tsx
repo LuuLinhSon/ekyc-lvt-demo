@@ -372,7 +372,7 @@ const EditKYCForm: React.FC<any> = (props) => {
             onChange={(e) => onHandleChange('addressLine', e)}
           />
 
-          <span className="field-name mt-3">{`Địa chỉ đầy đủ: ${values?.addressLine || ''}, ${values?.precinct} - ${
+          <span className="field-name mt-3">{`Địa chỉ đầy đủ: ${values?.addressLine || ''} ${values?.precinct} - ${
             values?.district
           } - ${values?.city}
           `}</span>

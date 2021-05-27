@@ -131,9 +131,12 @@ const StepEditKYC: React.FC<any> = (props) => {
         return;
       }
 
+      alert.error(resultDesc);
+    } catch (e) {
+      alert.error('Đã xảy ra lỗi vui lòng thử lại');
+    } finally {
       actionStoreAPI.setFetching(false);
-      return alert.error(resultDesc);
-    } catch (e) {}
+    }
   };
 
   return <StepEditKYCForm handleSubmit={handleSubmit} />;

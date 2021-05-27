@@ -40,6 +40,7 @@ const StepOne: React.FC<any> = (props) => {
             id="password"
             variant="outlined"
             name="password"
+            type="password"
             onChange={(e) => onHandleChange('password', e)}
           />
         </div>

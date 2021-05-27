@@ -17,6 +17,12 @@
     width: 100%;
   }
 
+  .filter-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+
   .wrapper-list-image {
     display: flex;
     flex-direction: column;

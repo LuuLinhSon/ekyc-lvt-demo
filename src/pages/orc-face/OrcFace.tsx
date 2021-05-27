@@ -1,4 +1,4 @@
-import { Button, FormControlLabel, makeStyles, Paper, Radio, RadioGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Button, FormControl, FormControlLabel, makeStyles, MenuItem, Paper, Radio, RadioGroup, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import React, { useState } from 'react';
 import ImageUploading from 'react-images-uploading';
 import API from 'api';
@@ -17,10 +17,9 @@ const useStyles = makeStyles({
 export const checkOrcImage = async (image: string) => {
   const headers = {
     'api-key': '7c8ba773-64cd-4ba5-a9bd-f035f06d0149',
-    'Accept-Encoding': 'gzip, deflate, br'
   };
   const response = await API({
-    url: 'http://10.36.126.111:8001/ocr/recognition',
+    url: 'https://ekycsandbox.lienviettech.vn/ocr',
     method: 'POST',
     headers,
     data: {
@@ -30,29 +29,23 @@ export const checkOrcImage = async (image: string) => {
   return response;
 };
 
-export const checkOrcQualityImage = async (image: string) => {
-  const headers = {
-    'Accept-Encoding': 'gzip, deflate, br'
-  };
+export const checkOrcQualityImage = async (image: string, isFront: boolean, document: string) => {
   const response = await API({
-    url: 'http://10.36.126.159:8001/api/check_quality',
+    url: 'https://ekycsandbox.lienviettech.vn/checkquality8006',
     method: 'POST',
-    headers,
     data: {
-      image
+      image,
+      case: isFront ? 'FrontCard' : 'BackCard',
+      document,
     },
   });
   return response;
 };
 
 export const checkFaceAttributes = async (image: string) => {
-  const headers = {
-    'Accept-Encoding': 'gzip, deflate, br'
-  };
   const response = await API({
-    url: 'http://10.36.126.159:8000/api/face_attributes',
+    url: 'https://ekycsandbox.lienviettech.vn/faceattr',
     method: 'POST',
-    headers,
     data: {
       image
     },
@@ -61,13 +54,9 @@ export const checkFaceAttributes = async (image: string) => {
 };
 
 export const checkFaceLiveness = async (image: string) => {
-  const headers = {
-    'Accept-Encoding': 'gzip, deflate, br'
-  };
   const response = await API({
-    url: 'http://10.36.126.159:15001/api/v1/anti-spoof',
+    url: 'https://ekycsandbox.lienviettech.vn/antispoof',
     method: 'POST',
-    headers,
     data: {
       image
     },
@@ -75,13 +64,29 @@ export const checkFaceLiveness = async (image: string) => {
   return response;
 };
 
+const mapBrightnessToValue = (brightness: string) => {
+  switch (brightness) {
+    case 'Dark': 
+      return 'Tối';
+    case 'Maybe_Dark': 
+      return 'Nghi ngờ tối';
+    case 'Normal':
+      return 'Bình thường';
+    case 'Maybe_Light':
+      return 'Nghi ngờ chói';
+    case 'Light':
+      return 'Chói';  
+    default: 
+      return '';
+  }
+}
+
 interface RowOrcInterface {
   src: any;
   isCorner: boolean;
   isPhotocopy: boolean;
   isFake: boolean;
-  isDark: boolean;
-  isLight: boolean;
+  brightness: string;
   isBlur: boolean;
 }
 
@@ -100,6 +105,8 @@ interface RowFaceInterface {
 const OrcFace: React.FC<any> = (props) => {
   const classes = useStyles();
   const [radio, setRadio] = useState('cmnd');
+  const [stateOrc, setStateOrc] = useState('front');
+  const [document, setDocument] = useState('OLD_ID');
   const [images, setImages] = useState([]);
   const [, actionStoreAPI] = useStoreAPI();
   const [rows, setRows] = useState<RowOrcInterface[] | []>([]);
@@ -108,6 +115,16 @@ const OrcFace: React.FC<any> = (props) => {
   const handleChange = (event: any) => {
     const value = event.target.value;
     setRadio(value);
+  }
+
+  const handleChangeFrontBack = (event: any) => {
+    const value = event.target.value;
+    setStateOrc(value);
+  };
+
+  const handleChangeDocument = (event: any) => {
+    const value = event.target.value;
+    setDocument(value);
   }
 
   const onChange = (imageList, addUpdateIndex) => {
@@ -127,19 +144,17 @@ const OrcFace: React.FC<any> = (props) => {
     try {
       actionStoreAPI.setFetching(true);
       const responseCheckOrc = await checkOrcImage(base64);
-      const responseCheckOrcQuality = await checkOrcQualityImage(base64);
+      const responseCheckOrcQuality = await checkOrcQualityImage(base64, stateOrc === 'front', document);
       const isCorner = get(responseCheckOrc, 'id_check', '') === 'CORNER';
       const isPhotocopy = get(responseCheckOrc, 'id_check', '') === 'BW';
       const isFake = get(responseCheckOrc, 'id_check', '') === 'FAKE';
-      const isDark = get(responseCheckOrcQuality, 'isDark', '');
-      const isLight = get(responseCheckOrcQuality, 'isLight', '');
-      const isBlur = !get(responseCheckOrcQuality, 'isNotBlur', '');
+      const brightness = get(responseCheckOrcQuality, 'Brightness', '');
+      const isBlur = get(responseCheckOrcQuality, 'Blur', '');
 
       setRows([{
         src: image?.data_url,
         isCorner,
-        isDark,
-        isLight,
+        brightness,
         isBlur,
         isPhotocopy,
         isFake
@@ -181,15 +196,58 @@ const OrcFace: React.FC<any> = (props) => {
     } catch(e) {} finally {
       actionStoreAPI.setFetching(false);
     }
-  }
+  }  
 
   return (
       <div className="container-orc">
         <Col md={4} sm={4}>
-          <RadioGroup row aria-label="orc" name="orc1" value={radio} onChange={handleChange}>
-            <FormControlLabel value="cmnd" control={<Radio />} label="CMND/CCCD" />
-            <FormControlLabel value="face" control={<Radio />} label="Khuôn mặt" />
+            <RadioGroup row aria-label="orc" name="orc1" value={radio} onChange={handleChange}>
+              <FormControlLabel value="cmnd" control={<Radio />} label="CMND/CCCD" />
+              <FormControlLabel value="face" control={<Radio />} label="Khuôn mặt" />
             </RadioGroup>
+            {
+              radio === 'cmnd' && 
+              <div className="filter-wrapper">
+                <FormControl className="w-50 mr-2" variant="outlined">
+                  <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="case"
+                    value={stateOrc}
+                    onChange={handleChangeFrontBack}
+                    name="case"
+                  >
+                    <MenuItem value="front">
+                      <em>Mặt trước</em>
+                    </MenuItem>
+                    <MenuItem value="back">
+                      <em>Mặt sau</em>
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl className="w-50 mr-2" variant="outlined">
+                  <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="document"
+                    value={document}
+                    onChange={handleChangeDocument}
+                    name="document"
+                  >
+                    <MenuItem value="OLD_ID">
+                      <em>CMND cũ</em>
+                    </MenuItem>
+                    <MenuItem value="NEW_ID ">
+                      <em>CCCD mới</em>
+                    </MenuItem>
+                    <MenuItem value="CHIP_ID ">
+                      <em>CCCD gắn chip</em>
+                    </MenuItem>
+                    <MenuItem value="PASSPORT">
+                      <em>Passport</em>
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            }
             <ImageUploading
               multiple
               value={images}
@@ -245,8 +303,7 @@ const OrcFace: React.FC<any> = (props) => {
                       <TableCell align="center" className="font-weight-bold">Bị cắt góc</TableCell>
                       <TableCell align="center" className="font-weight-bold">Photocopy</TableCell>
                       <TableCell align="center" className="font-weight-bold">Bị làm giả</TableCell>
-                      <TableCell align="center" className="font-weight-bold">Bị lóa</TableCell>
-                      <TableCell align="center" className="font-weight-bold">Bị Tối</TableCell>
+                      <TableCell align="center" className="font-weight-bold">Độ sáng</TableCell>
                       <TableCell align="center" className="font-weight-bold">Bị mờ</TableCell>
                     </TableRow>
                   </TableHead>
@@ -262,8 +319,7 @@ const OrcFace: React.FC<any> = (props) => {
                         <TableCell align="center">{row?.isCorner ? 'Có' : 'Không'}</TableCell>
                         <TableCell align="center">{row?.isPhotocopy ? 'Có' : 'Không'}</TableCell>
                         <TableCell align="center">{row?.isFake ? 'Có' : 'Không'}</TableCell>
-                        <TableCell align="center">{row?.isLight ? 'Có' : 'Không'}</TableCell>
-                        <TableCell align="center">{row?.isDark ? 'Có' : 'Không'}</TableCell>
+                        <TableCell align="center">{mapBrightnessToValue(row?.brightness)}</TableCell>
                         <TableCell align="center">{row?.isBlur ? 'Có' : 'Không'}</TableCell>
                       </TableRow>
                     ))}

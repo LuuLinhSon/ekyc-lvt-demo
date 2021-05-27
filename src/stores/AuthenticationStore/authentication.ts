@@ -100,7 +100,7 @@ export const actions = {
       setState({ ...prevState, ekycId });
     },
   setActionError:
-    (actionError: string) =>
+    (actionError: string | null) =>
     ({ setState, getState }: StoreApi) => {
       const prevState = getState();
       setState({ ...prevState, actionError });
@@ -170,8 +170,6 @@ export const actions = {
         });
 
         alert.error(resultDesc);
-
-        return;
       } catch (e) {
         setState({
           ...prevState,

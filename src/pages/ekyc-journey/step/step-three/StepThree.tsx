@@ -237,6 +237,7 @@ const StepThree: React.FC<any> = (props) => {
                 history.push(RoutesString.StepFour);
                 actionStepper.setCurrentPathStep(RoutesString.StepFour);
                 actionStepper.nextStep();
+                return;
               }
               setImgSrc([]);
               setIsCheckFaceNear(false);
@@ -246,7 +247,7 @@ const StepThree: React.FC<any> = (props) => {
               setImgSrc([]);
               setIsCheckFaceNear(false);
               reset();
-              alert.error('Something went wrong');
+              alert.error('Đã xảy ra lỗi vui lòng thử lại');
             } finally {
               actionStoreAPI.setFetching(false);
             }
