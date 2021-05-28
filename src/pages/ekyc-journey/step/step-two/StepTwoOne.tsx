@@ -426,7 +426,6 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
           ) : (
             <div className="wrapper-list-image">
                 {images?.map((image: any, index) => {
-                  console.log('imagesss', image);
                   const dataUrl = image.data_url;
                   return <div key={index} className="d-flex justify-content-center">
                   <img src={dataUrl} className="d-block" alt="CMND" width={WIDTH} />

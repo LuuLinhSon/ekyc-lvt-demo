@@ -165,13 +165,10 @@ const getStepContent = (numberImg: number) => {
 const StepThree: React.FC<any> = (props) => {
   const recorder = useMemo(() => new MicRecorder({ bitRate: 128 }), []);
   const history = useHistory();
-  const location = useLocation();
-  console.log(location);
-  
+  const location = useLocation();  
   const [, actionStoreAPI] = useStoreAPI();
   const [stateAuthentication] = useAuthentication();
   const [stateStepper, actionStepper] = useStepperStore();
-  console.log(stateStepper);
   const [imgsrc, setImgSrc] = useState<SourceLive[]>([]);
   const [isCheckFaceNear, setIsCheckFaceNear] = useState<boolean>(false);
   // const [recordState, setRecordState] = useState<RecordState>(null);
@@ -196,12 +193,12 @@ const StepThree: React.FC<any> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
-  //   if (isCurrentPage) return;
-  //   history.push(stateStepper.currentPathStep);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+    if (isCurrentPage) return;
+    history.push(stateStepper.currentPathStep);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (time === 0) {
