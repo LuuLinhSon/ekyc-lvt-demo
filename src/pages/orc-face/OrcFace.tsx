@@ -92,8 +92,24 @@ const mapBrightnessToValue = (brightness: string) => {
   }
 }
 
+const mapCardTypeToValue = (cardType: string) => {
+  switch (cardType) {
+    case 'OLD ID': 
+      return 'CMND 9 số';
+    case 'NEW ID': 
+      return 'CCCD 12 số';
+    case 'CHIP ID':
+      return 'CCCD gắn chip';
+    case 'PASSPORT':
+      return 'Hộ Chiếu'; 
+    default: 
+      return '';
+  }
+}
+
 interface RowOrcInterface {
   src: any;
+  cardType: string;
   isCorner: boolean;
   isPhotocopy: boolean;
   isFake: boolean;
@@ -155,6 +171,7 @@ const OrcFace: React.FC<any> = (props) => {
 
       setRows([{
         src: image?.data_url,
+        cardType: get(responseCheckOrc, 'document', ''),
         isCorner,
         brightness,
         isBlur,
@@ -256,6 +273,7 @@ const OrcFace: React.FC<any> = (props) => {
                     <TableRow>
                       <StyledTableCell align="center" className="font-weight-bold">STT</StyledTableCell>
                       <StyledTableCell align="center" className="font-weight-bold">Ảnh</StyledTableCell>
+                      <StyledTableCell align="center" className="font-weight-bold">Kiểu</StyledTableCell>
                       <StyledTableCell align="center" className="font-weight-bold">Bị cắt góc</StyledTableCell>
                       <StyledTableCell align="center" className="font-weight-bold">Photocopy</StyledTableCell>
                       <StyledTableCell align="center" className="font-weight-bold">Bị làm giả</StyledTableCell>
@@ -272,6 +290,7 @@ const OrcFace: React.FC<any> = (props) => {
                           <img src={row?.src} className="d-block" alt="LOGO_ALT" width="390"/>
                         </div>
                         </StyledTableCell>
+                        <StyledTableCell align="center">{mapCardTypeToValue(row?.cardType)}</StyledTableCell>
                         <StyledTableCell align="center">{row?.isCorner ? 'Có' : 'Không'}</StyledTableCell>
                         <StyledTableCell align="center">{row?.isPhotocopy ? 'Có' : 'Không'}</StyledTableCell>
                         <StyledTableCell align="center">{row?.isFake ? 'Có' : 'Không'}</StyledTableCell>

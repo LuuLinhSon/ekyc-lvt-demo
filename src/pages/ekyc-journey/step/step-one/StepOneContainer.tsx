@@ -4,7 +4,7 @@ import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { useHistory } from 'react-router-dom';
 import RoutesString from 'pages/routesString';
 import useStepperStore from 'stores/StepperStore/stepper';
-import { useAlert } from 'react-alert';
+// import { useAlert } from 'react-alert';
 import { useStoreAPI } from 'api/storeAPI';
 
 const StepOneContainer: React.FC<any> = (props) => {
@@ -12,7 +12,7 @@ const StepOneContainer: React.FC<any> = (props) => {
   const [, actionStepper] = useStepperStore();
   const [state, actions] = useAuthentication();
   const [, actionStoreAPI] = useStoreAPI();
-  const alert = useAlert();
+  // const alert = useAlert();
 
   useEffect(() => {
     if (state.loggedIn) {
@@ -25,7 +25,7 @@ const StepOneContainer: React.FC<any> = (props) => {
   }, [state.loggedIn, history]);
 
   const handleSubmit = async (values: any) => {
-    await actions.login(values, alert, actionStoreAPI);
+    await actions.login(values, actionStoreAPI);
   };
 
   return <StepOneForm handleSubmit={handleSubmit} />;

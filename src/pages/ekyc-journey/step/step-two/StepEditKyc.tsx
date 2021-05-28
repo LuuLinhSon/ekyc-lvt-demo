@@ -4,11 +4,12 @@ import StepEditKYCForm from './StepEditKYCForm';
 import API from 'api';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { get } from 'lodash';
-import { useAlert } from 'react-alert';
+// import { useAlert } from 'react-alert';
 import RoutesString from 'pages/routesString';
 import useStepperStore from 'stores/StepperStore/stepper';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useStoreAPI } from 'api/storeAPI';
+import { notify } from 'components/toast/Toast';
 
 const YYYYMMDDHHMMSS = () => {
   const date = new Date();
@@ -92,7 +93,7 @@ const StepEditKYC: React.FC<any> = (props) => {
   const location = useLocation();
   const [stateStepper, actionStepper] = useStepperStore();
   const [stateAuthentication] = useAuthentication();
-  const alert = useAlert();
+  // const alert = useAlert();
 
   useEffect(() => {
     const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
@@ -131,9 +132,9 @@ const StepEditKYC: React.FC<any> = (props) => {
         return;
       }
 
-      alert.error(resultDesc);
+      notify.error(resultDesc);
     } catch (e) {
-      alert.error('Đã xảy ra lỗi vui lòng thử lại');
+      notify.error('Đã xảy ra lỗi vui lòng thử lại');
     } finally {
       actionStoreAPI.setFetching(false);
     }

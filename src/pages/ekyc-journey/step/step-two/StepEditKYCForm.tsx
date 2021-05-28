@@ -92,7 +92,7 @@ const mapCardTypeToValue = (cardType: string) => {
       return 'CMND 9 số';
     case 'NEW ID': 
       return 'CCCD 12 số';
-    case 'CHIP_ID':
+    case 'CHIP ID':
       return 'CCCD gắn chip';
     case 'PASSPORT':
       return 'Hộ Chiếu'; 

@@ -11,8 +11,9 @@ import './StepTwoOne.scss';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { get, isEmpty, omit } from 'lodash';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
-import { useAlert } from 'react-alert';
+// import { useAlert } from 'react-alert';
 import { useStoreAPI } from 'api/storeAPI';
+import { notify } from 'components/toast/Toast';
 
 const sha1 = require('js-sha1');
 
@@ -223,7 +224,7 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
   const [stateAuthentication, actionAuthentication] = useAuthentication();
   const history = useHistory();
   const location = useLocation();
-  const alert = useAlert();
+  // const alert = useAlert();
 
   const isCaptureFrontCMNDStep = location?.pathname === RoutesString.StepTwoTwo;
 
@@ -317,9 +318,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
       }
 
       actionAuthentication.setActionError(isEmpty(actionError) ? null : actionError);
-      alert.error(resultDesc);
+      notify.error(resultDesc);
     } catch (e) {
-      alert.error('Đã xảy ra lỗi vui lòng thử lại');
+      notify.error('Đã xảy ra lỗi vui lòng thử lại');
     } finally {
       actionStoreAPI.setFetching(false);
     }
@@ -380,9 +381,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
 
       await redirectPage(actionAuthentication, actionStepper, history, actionError);
 
-      alert.error(resultDesc);
+      notify.error(resultDesc);
     } catch (e) {
-      alert.error('Đã xảy ra lỗi vui lòng thử lại');
+      notify.error('Đã xảy ra lỗi vui lòng thử lại');
     } finally {
       actionStoreAPI.setFetching(false);
     }

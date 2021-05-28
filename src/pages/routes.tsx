@@ -4,21 +4,29 @@ import withLayout from '../components/layout/withLayout';
 import ServiceLayout from '../components/layout/ServiceLayout/ServiceLayout';
 import AnonymousUserLayout from '../components/layout/AnonymousUserLayout/AnonymousUserLayout';
 import Spinner from 'components/spinner/Spinner';
-import { positions, Provider } from 'react-alert';
-import AlertTemplate from 'react-alert-template-basic';
+import { ToastContainer } from 'react-toastify';
+// import { positions, Provider } from 'react-alert';
+// import AlertTemplate from 'react-alert-template-basic';
 import RoutesString, { Pages } from './routesString';
 import PrivateRoute from './privateRoute';
 import LoadingContainer from './loadingContainer';
-
-const options = {
-  timeout: 5000,
-  position: positions.TOP_CENTER,
-};
+import { DURATION,  POSITION } from 'constants/enum';
 
 const Routes: React.FC = (): JSX.Element => {
   return (
-    <Provider template={AlertTemplate} {...options}>
+    <div>
       <LoadingContainer />
+      <ToastContainer
+        position={POSITION.TOP_CENTER}
+        autoClose={DURATION.TOAST}
+        hideProgressBar={false}
+        closeButton
+        closeOnClick
+        pauseOnHover
+        draggable={false}
+        limit={1}
+        style={{ height: 30 }}
+      />
       <Switch>
         <Route
           path={RoutesString.StepOne}
@@ -55,7 +63,7 @@ const Routes: React.FC = (): JSX.Element => {
         <PrivateRoute path={RoutesString.StepTreeTwo} exact={true} component={Pages.StepThreeTwo} />
         <PrivateRoute path={RoutesString.StepFour} exact={true} component={Pages.StepFour} />
       </Switch>
-    </Provider>
+    </div>
   );
 };
 

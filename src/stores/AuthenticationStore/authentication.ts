@@ -8,6 +8,7 @@ import databases from 'cache';
 // import publicIp from 'public-ip';
 import { get } from 'lodash';
 import { storeKeyStepper } from 'stores/StepperStore/stepper';
+import { notify } from 'components/toast/Toast';
 
 export const AUTHENTICATION_STORE = 'StoreAuthentication';
 type StoreApi = StoreActionApi<AuthenticationStates>;
@@ -120,7 +121,7 @@ export const actions = {
       }
     },
   login:
-    (values: any, alert: any, actionStoreAPI: any) =>
+    (values: any, actionStoreAPI: any) =>
     async ({ setState, getState }: StoreApi) => {
       const prevState = getState();
       try {
@@ -160,7 +161,7 @@ export const actions = {
             loggedIn: true,
           });
 
-          alert.success('Đăng nhập thành công');
+          notify.success('Đăng nhập thành công');
           return;
         }
 
@@ -169,13 +170,13 @@ export const actions = {
           loggedIn: false,
         });
 
-        alert.error(resultDesc);
+        notify.error(resultDesc);
       } catch (e) {
         setState({
           ...prevState,
           loggedIn: false,
         });
-        alert.error('Đã xảy ra lỗi vui lòng thử lại');
+        notify.error('Đã xảy ra lỗi vui lòng thử lại');
       } finally {
         actionStoreAPI.setFetching(false);
       }

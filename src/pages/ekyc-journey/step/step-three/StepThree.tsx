@@ -17,8 +17,9 @@ import useStepperStore from 'stores/StepperStore/stepper';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { useTimer } from 'use-timer';
-import { useAlert } from 'react-alert';
+// import { useAlert } from 'react-alert';
 import { useStoreAPI } from 'api/storeAPI';
+import { notify } from 'components/toast/Toast';
 const sha1 = require('js-sha1');
 const MicRecorder = require('mic-recorder-to-mp3');
 
@@ -182,7 +183,7 @@ const StepThree: React.FC<any> = (props) => {
   });
 
   let timer: any = null;
-  const alert = useAlert();
+  // const alert = useAlert();
   const numberVerifyList = stateAuthentication?.numberVerify?.split(',');
 
   useEffect(() => {
@@ -242,12 +243,12 @@ const StepThree: React.FC<any> = (props) => {
               setImgSrc([]);
               setIsCheckFaceNear(false);
               reset();
-              alert.error(resultDesc);
+              notify.error(resultDesc);
             } catch (e) {
               setImgSrc([]);
               setIsCheckFaceNear(false);
               reset();
-              alert.error('Đã xảy ra lỗi vui lòng thử lại');
+              notify.error('Đã xảy ra lỗi vui lòng thử lại');
             } finally {
               actionStoreAPI.setFetching(false);
             }
@@ -268,7 +269,6 @@ const StepThree: React.FC<any> = (props) => {
 
     if (imgsrc.length === 2) {
       start();
-      // setRecordState(RecordState.START);
       recorder
         .start()
         .then(() => {

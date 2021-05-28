@@ -1,0 +1,192 @@
+@import '~react-toastify/scss/main.scss';
+@import '../variables.scss';
+
+.Toastify__toast {
+  background-color: $white;
+  padding: 10px;
+  border-radius: 3px;
+  font-family: inherit;
+}
+
+.Toastify__toast p {
+  color: $colorGrey;
+  font-size: 14px;
+}
+
+.Toastify__toast h6 {
+  color: $black;
+  font-weight: 500;
+}
+
+// Toastiy: "SUCCESS" Alert
+
+.Toastify__toast--success .content-toast {
+  display: flex;
+  flex-direction: row;
+}
+
+.Toastify__toast--success .body {
+  display: flex;
+  flex-direction: column;
+}
+
+.Toastify__toast--success .title {
+  color: $black;
+}
+
+.Toastify__toast--success .anticon {
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+.Toastify__toast--success .anticon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.Toastify__toast--success {
+  border-left: 5px solid $success;
+}
+
+.Toastify__close-button--success {
+  color: $gray;
+}
+
+// Toastiy: "INFO" Alert
+.Toastify__toast--info .content-toast {
+  display: flex;
+  flex-direction: row;
+}
+
+.Toastify__toast--info .body {
+  display: flex;
+  flex-direction: column;
+}
+
+.Toastify__toast--info .title {
+  color: $black;
+}
+
+.Toastify__toast--info .anticon {
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+.Toastify__toast--info .anticon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.Toastify__toast--info {
+  border-left: 5px solid $info;
+}
+
+.Toastify__close-button--info {
+  color: $gray;
+}
+
+// Toastiy: "WARNING" Alert
+.Toastify__toast--warning .content-toast {
+  display: flex;
+  flex-direction: row;
+}
+
+.Toastify__toast--warning .body {
+  display: flex;
+  flex-direction: column;
+}
+
+.Toastify__toast--warning .title {
+  color: $black;
+}
+
+.Toastify__toast--warning .anticon {
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+.Toastify__toast--warning .anticon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.Toastify__toast--warning {
+  border-left: 5px solid $warning;
+}
+
+.Toastify__close-button--warning {
+  color: $gray;
+}
+
+// Toastiy: "ERROR" Alert
+.Toastify__toast--error .content-toast {
+  display: flex;
+  flex-direction: row;
+}
+
+.Toastify__toast--error .body {
+  display: flex;
+  flex-direction: column;
+}
+
+.Toastify__toast--error .title {
+  color: $black;
+}
+
+.Toastify__toast--error .anticon {
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+.Toastify__toast--error .anticon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.Toastify__toast--error {
+  border-left: 5px solid $error;
+}
+
+.Toastify__close-button--error {
+  color: $gray;
+}
+
+// Toastiy: "DEFAULT" Alert
+.Toastify__toast--default .content-toast {
+  display: flex;
+  flex-direction: row;
+}
+
+.Toastify__toast--default .body {
+  display: flex;
+  flex-direction: column;
+}
+
+.Toastify__toast--default .title {
+  color: $black;
+}
+
+.Toastify__toast--default .anticon {
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+.Toastify__toast--default .anticon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.Toastify__toast--default {
+  background-color: $white;
+  border-left: 3px solid $dimgray;
+}
+
+.Toastify__close-button--default {
+  color: $gray;
+}
+
+@media (min-width: 992px) {
+  .Toastify__toast-container {
+    width: 480px;
+  }
+}
