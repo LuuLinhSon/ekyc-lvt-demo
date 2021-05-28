@@ -1,15 +1,15 @@
 import { TextField } from '@material-ui/core';
 import { Form, withFormik, FormikBag } from 'formik';
 import { get } from 'lodash';
-import React, { useEffect, } from 'react';
+import React, { useEffect } from 'react';
 import './UserInfoForm.scss';
 
 const convertDateInput = (date: any) => {
-  return new Date(date).toLocaleDateString("en-GB");
+  return new Date(date).toLocaleDateString('en-GB');
 };
 
 const UserInfoForm: React.FC<any> = (props) => {
-  const { values, setFieldValue, setValues, dataFromServer } = props;  
+  const { values, setFieldValue, setValues, dataFromServer } = props;
 
   const onHandleChange = (name: string, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFieldValue(name, event.currentTarget.value);
@@ -31,7 +31,7 @@ const UserInfoForm: React.FC<any> = (props) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   useEffect(() => {
     setValues({
       fullName: get(dataFromServer, 'fullName', ''),
@@ -222,7 +222,7 @@ const UserInfoFormCall = withFormik<any, any>({
     district: '',
     precinct: '',
   }),
-  validate: values => {
+  validate: (values) => {
     const errors: any = {};
 
     if (values.uniqueValue === '') {

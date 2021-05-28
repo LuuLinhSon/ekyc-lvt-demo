@@ -9,7 +9,6 @@ import { get, isEmpty, isNull } from 'lodash';
 import { useHistory, useLocation } from 'react-router-dom';
 import RoutesString from 'pages/routesString';
 import Webcam from 'react-webcam';
-// import AudioReactRecorder, { RecordState } from 'audio-react-recorder';
 import API from 'api';
 
 import './StepThree.scss';
@@ -17,7 +16,6 @@ import useStepperStore from 'stores/StepperStore/stepper';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { useTimer } from 'use-timer';
-// import { useAlert } from 'react-alert';
 import { useStoreAPI } from 'api/storeAPI';
 import { notify } from 'components/toast/Toast';
 const sha1 = require('js-sha1');
@@ -33,26 +31,6 @@ interface SourceLive {
   secureHash: string;
   metadata?: string;
 }
-
-// const calculateImageSize = (base64String) => {
-//   let padding;
-
-//   if (base64String.endsWith('==')) {
-//     padding = 2;
-//   } else if (base64String.endsWith('=')) {
-//     padding = 1;
-//   } else {
-//     padding = 0;
-//   }
-
-//   const base64StringLength = base64String.length;
-
-//   const bytes = (3 * base64StringLength) / 4 - padding;
-
-//   const kBytes = bytes / 1000;
-
-//   return kBytes;
-// };
 
 const YYYYMMDDHHMMSS = () => {
   const date = new Date();
@@ -166,13 +144,12 @@ const getStepContent = (numberImg: number) => {
 const StepThree: React.FC<any> = (props) => {
   const recorder = useMemo(() => new MicRecorder({ bitRate: 128 }), []);
   const history = useHistory();
-  const location = useLocation();  
+  const location = useLocation();
   const [, actionStoreAPI] = useStoreAPI();
   const [stateAuthentication] = useAuthentication();
   const [stateStepper, actionStepper] = useStepperStore();
   const [imgsrc, setImgSrc] = useState<SourceLive[]>([]);
   const [isCheckFaceNear, setIsCheckFaceNear] = useState<boolean>(false);
-  // const [recordState, setRecordState] = useState<RecordState>(null);
   const webcamRef = useRef<Webcam>(null);
   const [fullDesc, setFullDesc] =
     useState<WithFaceDescriptor<WithFaceLandmarks<{ detection: FaceDetection }, FaceLandmarks68>>[] | null>(null);
@@ -183,7 +160,6 @@ const StepThree: React.FC<any> = (props) => {
   });
 
   let timer: any = null;
-  // const alert = useAlert();
   const numberVerifyList = stateAuthentication?.numberVerify?.split(',');
 
   useEffect(() => {
@@ -203,7 +179,6 @@ const StepThree: React.FC<any> = (props) => {
 
   useEffect(() => {
     if (time === 0) {
-      // setRecordState(RecordState.STOP);
       recorder
         .stop()
         .getMp3()
@@ -216,7 +191,6 @@ const StepThree: React.FC<any> = (props) => {
           });
 
           const ekycId = stateAuthentication?.ekycId || '';
-          // const metadata = data?.type?.split('/')[1] || '';
           const reader = new FileReader();
           reader.readAsDataURL(file);
           reader.onloadend = async function () {
@@ -253,9 +227,6 @@ const StepThree: React.FC<any> = (props) => {
               actionStoreAPI.setFetching(false);
             }
           };
-
-          // const player = new Audio(URL.createObjectURL(file));
-          // player.play();
         })
         .catch((e) => {});
     }
@@ -314,46 +285,6 @@ const StepThree: React.FC<any> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullDesc]);
 
-  // const onStop = (data) => {
-  //   const ekycId = stateAuthentication?.ekycId || '';
-  //   const metadata = data?.type?.split('/')[1] || '';
-  //   const reader = new FileReader();
-  //   reader.readAsDataURL(data.blob);
-  //   reader.onloadend = async function () {
-  //     const base64data = reader.result?.toString();
-  //     const base64 = base64data?.split(',')[1] || '';
-  //     const audioLive = {
-  //       label: 'audio_verify',
-  //       base64,
-  //       secureHash: sha1(base64) || '',
-  //       metadata,
-  //     };
-
-  //     try {
-  //       actionStoreAPI.setFetching(true);
-  //       const verifyEKYCResponse = await verifyEKYC(audioLive, imgsrc, ekycId, stateAuthentication);
-  //       const resultCode = get(verifyEKYCResponse, 'body.resultCode', '');
-  //       const resultDesc = get(verifyEKYCResponse, 'body.resultDesc', '');
-  //       if (resultCode === '0') {
-  //         history.push(RoutesString.StepFour);
-  //         actionStepper.setCurrentPathStep(RoutesString.StepFour);
-  //         actionStepper.nextStep();
-  //       }
-  //       setImgSrc([]);
-  //       setIsCheckFaceNear(false);
-  //       reset();
-  //       alert.error(resultDesc);
-  //     } catch (e) {
-  //       setImgSrc([]);
-  //       setIsCheckFaceNear(false);
-  //       reset();
-  //       alert.error('Something went wrong');
-  //     } finally {
-  //       actionStoreAPI.setFetching(false);
-  //     }
-  //   };
-  // };
-
   return (
     <div className="container">
       {getStepContent(imgsrc.length)}
@@ -363,9 +294,6 @@ const StepThree: React.FC<any> = (props) => {
         <span className="loading">Có quá nhiều người trong camera</span>
       ) : null}
       {imgsrc.length === 2 && <span>{time}</span>}
-      {/* {imgsrc.length === 2 && (
-        <AudioReactRecorder type="audio/mp3" canvasHeight={50} state={recordState} onStop={onStop} />
-      )} */}
       <div
         style={{
           width: WIDTH,

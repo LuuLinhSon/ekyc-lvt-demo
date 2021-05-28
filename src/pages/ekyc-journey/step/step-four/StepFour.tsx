@@ -5,7 +5,7 @@ import API from 'api';
 import { useHistory, useLocation, withRouter } from 'react-router-dom';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
-import publicIp from "public-ip";
+import publicIp from 'public-ip';
 import { get } from 'lodash';
 import StepWizard from 'react-step-wizard';
 import CallVideo from './CallVideo';
@@ -13,7 +13,6 @@ import InitialCall from './CallInitial';
 import useStepperStore from 'stores/StepperStore/stepper';
 import RoutesString from 'pages/routesString';
 import CallSuccess from './CallSuccess';
-
 
 const YYYYMMDDHHMMSS = () => {
   const date = new Date();
@@ -85,100 +84,127 @@ const getAccessToken = async (stateAuthentication: AuthenticationStates) => {
   return initEKYCResponse;
 };
 
-const settingClientEvents = (client, call, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction) => {
+const settingClientEvents = (
+  client,
+  call,
+  remoteVideo,
+  localVideo,
+  setIsRingRing,
+  setPrepareCall,
+  setDataFromServer,
+  setAction,
+) => {
   client.on('connect', function () {
-      console.log('++++++++++++++ connected to StringeeServer');
+    console.log('++++++++++++++ connected to StringeeServer');
   });
 
   client.on('authen', function (res) {
-      console.log('authen', res);
+    console.log('authen', res);
   });
 
   client.on('disconnect', function () {
-      console.log('++++++++++++++ disconnected: ');
+    console.log('++++++++++++++ disconnected: ');
   });
 
-  client.on('custommessage', function(info) {
-      console.log('on info:' + JSON.stringify(info));
-      const action = get(info, 'message.action', '');
-      setDataFromServer(get(info, 'message.payload', {}));
-      setAction(action);
+  client.on('custommessage', function (info) {
+    console.log('on info:' + JSON.stringify(info));
+    const action = get(info, 'message.action', '');
+    setDataFromServer(get(info, 'message.payload', {}));
+    setAction(action);
   });
 
   client.on('incomingcall2', function (incomingcall2) {
-      call = incomingcall2;
-      settingCallEvent(incomingcall2, remoteVideo, localVideo, setIsRingRing, setPrepareCall,setDataFromServer, setAction);
+    call = incomingcall2;
+    settingCallEvent(
+      incomingcall2,
+      remoteVideo,
+      localVideo,
+      setIsRingRing,
+      setPrepareCall,
+      setDataFromServer,
+      setAction,
+    );
 
-      call.ringing(function (res) {});
+    call.ringing(function (res) {});
 
-      console.log('++++++++++++++ incomingcall2', incomingcall2);
+    console.log('++++++++++++++ incomingcall2', incomingcall2);
   });
 
   client.on('requestnewtoken', function () {
-      console.log('++++++++++++++ requestnewtoken; please get new access_token from YourServer and call client.connect(new_access_token)+++++++++');
+    console.log(
+      '++++++++++++++ requestnewtoken; please get new access_token from YourServer and call client.connect(new_access_token)+++++++++',
+    );
   });
-}
+};
 
 const callStarted = () => {
   console.log('CALL_STARTED');
-}
+};
 
 const callEnded = () => {
   console.log('CALL_ENDED');
-}
+};
 
-const settingCallEvent = (call1, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction) => {
+const settingCallEvent = (
+  call1,
+  remoteVideo,
+  localVideo,
+  setIsRingRing,
+  setPrepareCall,
+  setDataFromServer,
+  setAction,
+) => {
   console.log('localVideo', localVideo);
-  
+
   callStarted();
   call1.on('addremotestream', function (stream) {
-      console.log('addremotestream');
-      // reset srcObject to work around minor bugs in Chrome and Edge.
-      remoteVideo.current.srcObject = null;
-      remoteVideo.current.srcObject = stream;
+    console.log('addremotestream');
+    // reset srcObject to work around minor bugs in Chrome and Edge.
+    remoteVideo.current.srcObject = null;
+    remoteVideo.current.srcObject = stream;
   });
 
   call1.on('addlocalstream', function (stream) {
-      console.log('addlocalstream');
-      // reset srcObject to work around minor bugs in Chrome and Edge.
-      localVideo.current.srcObject  = null;
-      localVideo.current.srcObject  = stream;
+    console.log('addlocalstream');
+    // reset srcObject to work around minor bugs in Chrome and Edge.
+    localVideo.current.srcObject = null;
+    localVideo.current.srcObject = stream;
   });
 
   call1.on('error', function (info) {
-      console.log('on error: ' + JSON.stringify(info));
+    console.log('on error: ' + JSON.stringify(info));
   });
 
   call1.on('signalingstate', function (state) {
-      console.log('signalingstate ', state);
-      if (state.code === 6) {
-          callEnded();
-          setAction('ENDED');
-      } else if (state.code === 5) {
-          callEnded();
-          setAction('ENDED');
-      } else if (state.code === 3) {
-        setIsRingRing(false);
-        setPrepareCall(false);
+    console.log('signalingstate ', state);
+    if (state.code === 6) {
+      callEnded();
+      setAction('ENDED');
+    } else if (state.code === 5) {
+      callEnded();
+      setAction('ENDED');
+    } else if (state.code === 3) {
+      setIsRingRing(false);
+      setPrepareCall(false);
     }
   });
 
   call1.on('mediastate', function (state) {
-      console.log('mediastate ', state);
+    console.log('mediastate ', state);
   });
 
   call1.on('info', function (info) {
-      console.log('on info:' + JSON.stringify(info));
+    console.log('on info:' + JSON.stringify(info));
   });
 
   call1.on('otherdevice', function (data) {
-      console.log('on otherdevice:' + JSON.stringify(data));
-      if ((data.type === 'CALL_STATE' && data.code >= 200) || data.type === 'CALL_END') {
-          setAction('ENDED')
-          callEnded();
-      }
+    console.log('on otherdevice:' + JSON.stringify(data));
+    if ((data.type === 'CALL_STATE' && data.code >= 200) || data.type === 'CALL_END') {
+      setAction('ENDED');
+      callEnded();
+    }
   });
-}
+};
 
 const StepFour: React.FC<any> = (props) => {
   const global: any = window;
@@ -199,9 +225,18 @@ const StepFour: React.FC<any> = (props) => {
     const initVideoCall = async function () {
       const response = await getAccessToken(stateAuthentication);
       const accessToken = get(response, 'body.accessToken', '');
-      settingClientEvents(stringeeClient, call, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction);
+      settingClientEvents(
+        stringeeClient,
+        call,
+        remoteVideo,
+        localVideo,
+        setIsRingRing,
+        setPrepareCall,
+        setDataFromServer,
+        setAction,
+      );
       stringeeClient?.connect(accessToken);
-    }
+    };
     initVideoCall();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -219,9 +254,9 @@ const StepFour: React.FC<any> = (props) => {
     settingCallEvent(call, remoteVideo, localVideo, setIsRingRing, setPrepareCall, setDataFromServer, setAction);
 
     call.makeCall(function (res) {
-        console.log('make call callback: ' + JSON.stringify(res));
+      console.log('make call callback: ' + JSON.stringify(res));
     });
-  }
+  };
 
   const logout = async () => {
     await actionAuthentication.logout();
@@ -233,14 +268,20 @@ const StepFour: React.FC<any> = (props) => {
     setPrepareCall(true);
     setIsRingRing(false);
     logout();
-  }  
+  };
 
   return (
     <div className="container">
       <StepWizard>
-        <InitialCall isRingRing={isRingRing} makeCall={makeCall} prepareCall={prepareCall}/>
-        <CallVideo remoteVideo={remoteVideo} localVideo={localVideo} dataFromServer={dataFromServer} rejectCall={rejectCall} action={action}/>
-        <CallSuccess action={action}/>
+        <InitialCall isRingRing={isRingRing} makeCall={makeCall} prepareCall={prepareCall} />
+        <CallVideo
+          remoteVideo={remoteVideo}
+          localVideo={localVideo}
+          dataFromServer={dataFromServer}
+          rejectCall={rejectCall}
+          action={action}
+        />
+        <CallSuccess action={action} />
       </StepWizard>
     </div>
   );

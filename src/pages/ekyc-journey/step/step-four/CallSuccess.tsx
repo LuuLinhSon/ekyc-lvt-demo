@@ -24,16 +24,20 @@ const CallSuccess: React.FC<any> = ({ action }) => {
   return (
     <div className="container">
       <>
-        <div className="d-flex justify-content-center mb-5">{isApprove ? 'Chúc mừng quý khách đã thực hiện thành công cuộc gọi định danh' : 'Rất lấy làm tiếc. Hồ sơ của quý khách không đạt yêu cầu'}</div>
+        <div className="d-flex justify-content-center mb-5">
+          {isApprove
+            ? 'Chúc mừng quý khách đã thực hiện thành công cuộc gọi định danh'
+            : 'Rất lấy làm tiếc. Hồ sơ của quý khách không đạt yêu cầu'}
+        </div>
         <div className="mb-4 d-flex justify-content-center">
           <img src={isApprove ? TICK_ICON : REJECT_ICON} className="d-block" alt="LOGO_ALT" height="100" />
         </div>
       </>
       <div className="wrapper-button">
-          <Button className="action-button" variant="contained" color="primary" onClick={logout}>
-            Quay về trang chủ
-          </Button>
-        </div>  
+        <Button className="action-button" variant="contained" color="primary" onClick={logout}>
+          Quay về trang chủ
+        </Button>
+      </div>
     </div>
   );
 };

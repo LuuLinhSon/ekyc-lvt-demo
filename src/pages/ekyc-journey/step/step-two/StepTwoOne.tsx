@@ -410,81 +410,80 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
           height: HEIGHT,
         }}
       >
-        {
-          images.length === 0 ? (
-            <div style={{ position: 'relative', width: WIDTH }}>
-              <div style={{ position: 'absolute' }}>
-                <Webcam
-                  audio={false}
-                  width={WIDTH}
-                  height={HEIGHT}
-                  ref={webcamRef}
-                  screenshotFormat="image/jpeg"
-                  videoConstraints={true}
-                />
-              </div>
+        {images.length === 0 ? (
+          <div style={{ position: 'relative', width: WIDTH }}>
+            <div style={{ position: 'absolute' }}>
+              <Webcam
+                audio={false}
+                width={WIDTH}
+                height={HEIGHT}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={true}
+              />
             </div>
-          ) : (
-            <div className="wrapper-list-image">
-                {images?.map((image: any, index) => {
-                  const dataUrl = image.data_url;
-                  return <div key={index} className="d-flex justify-content-center">
+          </div>
+        ) : (
+          <div className="wrapper-list-image">
+            {images?.map((image: any, index) => {
+              const dataUrl = image.data_url;
+              return (
+                <div key={index} className="d-flex justify-content-center">
                   <img src={dataUrl} className="d-block" alt="CMND" width={WIDTH} />
                 </div>
-                })}
-              </div>
-          )
-        }
-        
+              );
+            })}
+          </div>
+        )}
       </div>
       <div className="wrapper-button">
-        {
-          images.length === 0 ? (
-            <Button
-              className="next-button-capture"
-              variant="contained"
-              color="primary"
-              onClick={isCaptureFrontCMNDStep ? () => captureFront(true) : () => captureBack(true)}
-            >
-              Chụp
-            </Button>
-          ) : (
-            <Button
-              className="next-button-capture"
-              variant="contained"
-              color="primary"
-              onClick={isCaptureFrontCMNDStep ? () => captureFront(false) : () => captureBack(false)}
-            >
-              Gửi ảnh
-            </Button>
-          )
-        }
-        <ImageUploading
-            multiple
-            value={images}
-            onChange={onChange}
-            maxNumber={1}
-            dataURLKey="data_url"
+        {images.length === 0 ? (
+          <Button
+            className="next-button-capture"
+            variant="contained"
+            color="primary"
+            onClick={isCaptureFrontCMNDStep ? () => captureFront(true) : () => captureBack(true)}
           >
-          {({
-            onImageUpload,
-            onImageRemoveAll,
-            dragProps,
-          }) => (
+            Chụp
+          </Button>
+        ) : (
+          <Button
+            className="next-button-capture"
+            variant="contained"
+            color="primary"
+            onClick={isCaptureFrontCMNDStep ? () => captureFront(false) : () => captureBack(false)}
+          >
+            Gửi ảnh
+          </Button>
+        )}
+        <ImageUploading multiple value={images} onChange={onChange} maxNumber={1} dataURLKey="data_url">
+          {({ onImageUpload, onImageRemoveAll, dragProps }) => (
             <>
-              {images.length === 0 &&
-              <Button className="next-button-capture" variant="contained" color="primary" onClick={onImageUpload} {...dragProps}>
-                Chọn ảnh
-              </Button>
-              }
-              {images.length !== 0 &&
-              <Button className="next-button-capture" variant="contained" color="primary" onClick={onImageRemoveAll} {...dragProps}>
-                Xóa ảnh
-              </Button>
-              }
+              {images.length === 0 && (
+                <Button
+                  className="next-button-capture"
+                  variant="contained"
+                  color="primary"
+                  onClick={onImageUpload}
+                  {...dragProps}
+                >
+                  Chọn ảnh
+                </Button>
+              )}
+              {images.length !== 0 && (
+                <Button
+                  className="next-button-capture"
+                  variant="contained"
+                  color="primary"
+                  onClick={onImageRemoveAll}
+                  {...dragProps}
+                >
+                  Xóa ảnh
+                </Button>
+              )}
             </>
           )}
-          </ImageUploading>
+        </ImageUploading>
       </div>
     </div>
   );

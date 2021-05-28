@@ -7,6 +7,7 @@ import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import './StepEditKycForm.scss';
 import { useStoreAPI } from 'api/storeAPI';
+import { notify } from 'components/toast/Toast';
 
 const convertDateInput = (date: string) => {
   const [day, month, year] = date.split('/');
@@ -82,24 +83,26 @@ export const getListArea = async (stateAuthentication: AuthenticationStates) => 
 };
 
 const getParentCode = (parentValue: string, listParent: any, forDistrict: boolean) => {
-  const parent: any = listParent.find((item: any) => forDistrict ? item.provinceName === parentValue : item.districtName === parentValue);  
+  const parent: any = listParent.find((item: any) =>
+    forDistrict ? item.provinceName === parentValue : item.districtName === parentValue,
+  );
   return parent?.areaCode;
-}
+};
 
 const mapCardTypeToValue = (cardType: string) => {
   switch (cardType) {
-    case 'OLD ID': 
+    case 'OLD ID':
       return 'CMND 9 số';
-    case 'NEW ID': 
+    case 'NEW ID':
       return 'CCCD 12 số';
     case 'CHIP ID':
       return 'CCCD gắn chip';
     case 'PASSPORT':
-      return 'Hộ Chiếu'; 
-    default: 
+      return 'Hộ Chiếu';
+    default:
       return '';
   }
-}
+};
 
 const EditKYCForm: React.FC<any> = (props) => {
   const { values, handleSubmit, setFieldValue, setValues, errors } = props;
@@ -147,12 +150,12 @@ const EditKYCForm: React.FC<any> = (props) => {
   };
 
   const onHandleChangeDropdown = (name: string, event: any) => {
-    if(name === 'city') {
+    if (name === 'city') {
       setFieldValue('district', '');
       setFieldValue('precinct', '');
     }
 
-    if(name === 'district') {
+    if (name === 'district') {
       setFieldValue('precinct', '');
     }
 
@@ -171,23 +174,32 @@ const EditKYCForm: React.FC<any> = (props) => {
 
   useEffect(() => {
     const initForm = async function () {
-      actionStoreAPI.setFetching(true);
-      const response = await getListArea(stateAuthentication);
-      actionStoreAPI.setFetching(false);
-      const listArea = get(response, 'body.area', []);
-      const listCity = listArea.filter((item) => item.areaType === 'P');
-      const listDistrict = listArea.filter((item) => item.areaType === 'D').map((item) => {
-        return { ...item, districtName: item?.districtName?.replace('H.', '')}
-      });
-      const listPrecinct = listArea.filter((item) => item.areaType === 'C').map((item) => {
-        return { ...item, precinctName: item?.precinctName?.replace('Xã ', '')}
-      });;
-      
-      setListCity(listCity);
-      setListDistrict(listDistrict);
-      setListPrecinct(listPrecinct); 
-      setCurrentCityCode(getParentCode(get(userInformation, 'provinceDetail.city', ''), listCity, true));
-      setCurrentDistrictCode(getParentCode(get(userInformation, 'provinceDetail.district', ''), listDistrict, false));
+      try {
+        actionStoreAPI.setFetching(true);
+        const response = await getListArea(stateAuthentication);
+        const listArea = get(response, 'body.area', []);
+        const listCity = listArea.filter((item) => item.areaType === 'P');
+        const listDistrict = listArea
+          .filter((item) => item.areaType === 'D')
+          .map((item) => {
+            return { ...item, districtName: item?.districtName?.replace('H.', '') };
+          });
+        const listPrecinct = listArea
+          .filter((item) => item.areaType === 'C')
+          .map((item) => {
+            return { ...item, precinctName: item?.precinctName?.replace('Xã ', '') };
+          });
+
+        setListCity(listCity);
+        setListDistrict(listDistrict);
+        setListPrecinct(listPrecinct);
+        setCurrentCityCode(getParentCode(get(userInformation, 'provinceDetail.city', ''), listCity, true));
+        setCurrentDistrictCode(getParentCode(get(userInformation, 'provinceDetail.district', ''), listDistrict, false));
+      } catch (e) {
+        notify.error('Đã có lỗi xảy ra. Vui lòng tải lại trang');
+      } finally {
+        actionStoreAPI.setFetching(false);
+      }
     };
     initForm();
     setValues({
@@ -212,7 +224,7 @@ const EditKYCForm: React.FC<any> = (props) => {
     setCurrentCityCode(getParentCode(values.city, listCity, true));
     setCurrentDistrictCode(getParentCode(values.district, listDistrict, false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values]);  
+  }, [values]);
 
   return (
     <Form>
@@ -283,7 +295,11 @@ const EditKYCForm: React.FC<any> = (props) => {
           <div className="block-row">
             <div className="w-50 pr-2">
               <span className="field-name mt-5">Giới tính</span>
-              <FormControl variant="outlined" fullWidth={true} error={validation?.gender?.error || errors.gender === 'Required'}>
+              <FormControl
+                variant="outlined"
+                fullWidth={true}
+                error={validation?.gender?.error || errors.gender === 'Required'}
+              >
                 <Select
                   labelId="demo-simple-select-outlined-label"
                   id="demo-simple-select-outlined"
@@ -332,7 +348,11 @@ const EditKYCForm: React.FC<any> = (props) => {
           </div>
           {!isEmpty(cityCode) && <div className="field-name my-3">{`Mã thành phố: ${cityCode}`}</div>}
           <span className="field-name mt-1">Tỉnh/Thành phố</span>
-          <FormControl variant="outlined" fullWidth={true} error={validation?.city?.error || errors.city === 'Required'}>
+          <FormControl
+            variant="outlined"
+            fullWidth={true}
+            error={validation?.city?.error || errors.city === 'Required'}
+          >
             <Select
               labelId="demo-simple-select-outlined-label"
               id="city"
@@ -346,14 +366,14 @@ const EditKYCForm: React.FC<any> = (props) => {
                 <em>None</em>
               </MenuItem>
               {listCity.map((item: any, idx: number) => {
-                return <MenuItem key={idx} value={item.provinceName}>{`${item.provinceName}`}</MenuItem>
+                return <MenuItem key={idx} value={item.provinceName}>{`${item.provinceName}`}</MenuItem>;
               })}
             </Select>
             <FormHelperText>{validation?.city?.textError || errors.city}</FormHelperText>
           </FormControl>
           <div className="block-row">
             <div className="w-50 pr-2">
-            {!isEmpty(districtCode) && <div className="field-name mt-3">{`Mã Quận/Huyện: ${districtCode}`}</div>}
+              {!isEmpty(districtCode) && <div className="field-name mt-3">{`Mã Quận/Huyện: ${districtCode}`}</div>}
               <span className="field-name mt-1">Quận/Huyện</span>
               <FormControl variant="outlined" fullWidth={true} error={errors.district === 'Required'}>
                 <Select
@@ -368,15 +388,18 @@ const EditKYCForm: React.FC<any> = (props) => {
                   <MenuItem value="">
                     <em>None</em>
                   </MenuItem>
-                  {values?.city !== '' && listDistrict.filter((item: any) => item.parentCode === currentCityCode).map((item: any, idx: number) => {
-                    return <MenuItem key={idx} value={item.districtName}>{`${item.districtName}`}</MenuItem>
-                  })}
+                  {values?.city !== '' &&
+                    listDistrict
+                      .filter((item: any) => item.parentCode === currentCityCode)
+                      .map((item: any, idx: number) => {
+                        return <MenuItem key={idx} value={item.districtName}>{`${item.districtName}`}</MenuItem>;
+                      })}
                 </Select>
                 <FormHelperText>{errors.district}</FormHelperText>
               </FormControl>
             </div>
             <div className="flex-column w-50 pr-2">
-            {!isEmpty(wardCode) && <div className="field-name mt-3">{`Mã Phường/Xã: ${wardCode}`}</div>}
+              {!isEmpty(wardCode) && <div className="field-name mt-3">{`Mã Phường/Xã: ${wardCode}`}</div>}
               <span className="field-name mt-1">Phường/Xã</span>
               <FormControl variant="outlined" fullWidth={true} error={errors.precinct === 'Required'}>
                 <Select
@@ -391,9 +414,12 @@ const EditKYCForm: React.FC<any> = (props) => {
                   <MenuItem value="">
                     <em>None</em>
                   </MenuItem>
-                  {values?.district !== '' && listPrecinct.filter((item: any) => item.parentCode === currentDistrictCode).map((item: any, idx: number) => {
-                    return <MenuItem key={idx} value={item.precinctName}>{`${item.precinctName}`}</MenuItem>
-                  })}
+                  {values?.district !== '' &&
+                    listPrecinct
+                      .filter((item: any) => item.parentCode === currentDistrictCode)
+                      .map((item: any, idx: number) => {
+                        return <MenuItem key={idx} value={item.precinctName}>{`${item.precinctName}`}</MenuItem>;
+                      })}
                 </Select>
                 <FormHelperText>{errors.precinct}</FormHelperText>
               </FormControl>
@@ -465,7 +491,7 @@ const StepEditKYCForm = withFormik<any, any>({
     district: '',
     precinct: '',
   }),
-  validate: values => {
+  validate: (values) => {
     const errors: any = {};
 
     if (values.uniqueValue === '') {

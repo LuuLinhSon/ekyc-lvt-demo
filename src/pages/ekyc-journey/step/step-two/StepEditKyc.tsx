@@ -4,7 +4,6 @@ import StepEditKYCForm from './StepEditKYCForm';
 import API from 'api';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { get } from 'lodash';
-// import { useAlert } from 'react-alert';
 import RoutesString from 'pages/routesString';
 import useStepperStore from 'stores/StepperStore/stepper';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -93,7 +92,6 @@ const StepEditKYC: React.FC<any> = (props) => {
   const location = useLocation();
   const [stateStepper, actionStepper] = useStepperStore();
   const [stateAuthentication] = useAuthentication();
-  // const alert = useAlert();
 
   useEffect(() => {
     const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
@@ -116,7 +114,7 @@ const StepEditKYC: React.FC<any> = (props) => {
       email: values.email,
       placeId: '240',
       addressLine: values.addressLine,
-    };    
+    };
 
     try {
       actionStoreAPI.setFetching(true);

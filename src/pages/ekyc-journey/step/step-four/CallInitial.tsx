@@ -14,9 +14,9 @@ const InitialCall: React.FC<any> = ({ isRingRing, makeCall, nextStep, prepareCal
   const [, actionStepper] = useStepperStore();
   const history = useHistory();
   useEffect(() => {
-    if(!prepareCall) return nextStep();
+    if (!prepareCall) return nextStep();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prepareCall]);
 
   const logout = async () => {
@@ -26,9 +26,8 @@ const InitialCall: React.FC<any> = ({ isRingRing, makeCall, nextStep, prepareCal
   };
 
   const makeCallVideo = () => {
-    // nextStep();
     makeCall();
-  }
+  };
 
   return (
     <div className="container">
@@ -37,35 +36,37 @@ const InitialCall: React.FC<any> = ({ isRingRing, makeCall, nextStep, prepareCal
         <div className="mb-4 d-flex justify-content-center">
           <img src={TICK_ICON} className="d-block" alt="LOGO_ALT" height="100" />
         </div>
-        {isRingRing && <div className="ring-ring">
-          <span className="header-text">CUỘC GỌI ĐỊNH DANH</span>
-          <div className="mb-4 d-flex justify-content-center">
-            <img src={USER_ICON} className="d-block" alt="LOGO_ALT" height="150" />
+        {isRingRing && (
+          <div className="ring-ring">
+            <span className="header-text">CUỘC GỌI ĐỊNH DANH</span>
+            <div className="mb-4 d-flex justify-content-center">
+              <img src={USER_ICON} className="d-block" alt="LOGO_ALT" height="150" />
+            </div>
+            <span className="loading">Đang kết nối với tổng đài viên</span>
           </div>
-          <span className="loading">Đang kết nối với tổng đài viên</span>
-        </div>}
+        )}
       </>
       <div className="wrapper-button">
         {isRingRing ? (
           <>
-          <Button className="action-button" variant="contained" color="primary" onClick={logout}>
+            <Button className="action-button" variant="contained" color="primary" onClick={logout}>
               Bỏ qua
-          </Button>
-          <Button className="action-button bg-danger" variant="contained" color="primary" onClick={logout}>
-          Hủy bỏ
-        </Button>
-        </>
+            </Button>
+            <Button className="action-button bg-danger" variant="contained" color="primary" onClick={logout}>
+              Hủy bỏ
+            </Button>
+          </>
         ) : (
           <>
             <Button className="action-button" variant="contained" color="primary" onClick={logout}>
               Bỏ qua
             </Button>
             <Button className="action-button" variant="contained" color="primary" onClick={makeCallVideo}>
-            Gọi video
+              Gọi video
             </Button>
           </>
         )}
-        </div>  
+      </div>
     </div>
   );
 };

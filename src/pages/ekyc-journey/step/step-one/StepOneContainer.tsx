@@ -4,7 +4,6 @@ import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { useHistory } from 'react-router-dom';
 import RoutesString from 'pages/routesString';
 import useStepperStore from 'stores/StepperStore/stepper';
-// import { useAlert } from 'react-alert';
 import { useStoreAPI } from 'api/storeAPI';
 
 const StepOneContainer: React.FC<any> = (props) => {
@@ -12,7 +11,6 @@ const StepOneContainer: React.FC<any> = (props) => {
   const [, actionStepper] = useStepperStore();
   const [state, actions] = useAuthentication();
   const [, actionStoreAPI] = useStoreAPI();
-  // const alert = useAlert();
 
   useEffect(() => {
     if (state.loggedIn) {
