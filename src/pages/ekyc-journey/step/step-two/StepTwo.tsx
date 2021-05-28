@@ -35,7 +35,7 @@ const StepTwo: React.FC<any> = (props) => {
           <li>Chụp ảnh trong môi trường đủ sáng</li>
           <li>Đảm bảo ảnh rõ nét, không bị mờ loá</li>
         </ul>
-        <img src={CMND_CCCD} className="d-block" alt="LOGO_ALT" height="200" width="100%" />
+        <img src={CMND_CCCD} className="d-block" alt="LOGO_ALT" width="100%" />
       </div>
       <Button className="next-button" variant="contained" color="primary" onClick={nextToStep}>
         Tiếp tục

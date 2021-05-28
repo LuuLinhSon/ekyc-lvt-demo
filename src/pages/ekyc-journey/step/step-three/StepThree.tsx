@@ -152,7 +152,7 @@ const getStepContent = (numberImg: number) => {
       return (
         <div className="d-flex flex-column justify-content-center align-items-center mt-3 p-2">
           <div>
-            <span className="font-weight-bold">Bước 3-3</span>: Xác thực dãy số
+            <span className="font-weight-bold">Bước 3-3</span>: Đọc dãy số
           </div>
           <span className="text-center mt-2">Vui lòng đọc chính xác dãy số sau</span>
         </div>
@@ -166,9 +166,12 @@ const StepThree: React.FC<any> = (props) => {
   const recorder = useMemo(() => new MicRecorder({ bitRate: 128 }), []);
   const history = useHistory();
   const location = useLocation();
+  console.log(location);
+  
   const [, actionStoreAPI] = useStoreAPI();
   const [stateAuthentication] = useAuthentication();
   const [stateStepper, actionStepper] = useStepperStore();
+  console.log(stateStepper);
   const [imgsrc, setImgSrc] = useState<SourceLive[]>([]);
   const [isCheckFaceNear, setIsCheckFaceNear] = useState<boolean>(false);
   // const [recordState, setRecordState] = useState<RecordState>(null);
@@ -193,12 +196,12 @@ const StepThree: React.FC<any> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
-    if (isCurrentPage) return;
-    history.push(stateStepper.currentPathStep);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
+  //   if (isCurrentPage) return;
+  //   history.push(stateStepper.currentPathStep);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
     if (time === 0) {
@@ -430,16 +433,6 @@ const StepThree: React.FC<any> = (props) => {
           </div>
         )}
       </div>
-
-      {/* <Button
-        disabled={isEmpty(fullDesc) || isNull(fullDesc) || fullDesc?.length > 1}
-        className="next-button"
-        variant="contained"
-        color="primary"
-        onClick={next}
-      >
-        Tiếp
-      </Button> */}
     </div>
   );
 };

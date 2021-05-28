@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 const WIDTH_MAX_BOX = 160;
-const HEIGHT_MAX_BOX = 160;
+const HEIGHT_MAX_BOX = 200;
 const X_MAX_BOX = 136;
 const Y_MAX_BOX = 65;
 
-const WIDTH_MIN_BOX = 120;
-const HEIGHT_MIN_BOX = 120;
+const WIDTH_MIN_BOX = 130;
+const HEIGHT_MIN_BOX = 150;
 const X_MIN_BOX = 159;
 const Y_MIN_BOX = 80;
 
@@ -33,7 +33,7 @@ const DrawBox: React.FC<any> = ({ notShowFrame = false, checkFaceNear, fullDesc,
       const _W = imageWidth * relativeBox.width;
       const _H = (relativeBox.height * imageWidth * dimension._height) / dimension._width;
 
-      if (checkFaceNear && _W * _H >= 23500 && _W * _H <= 26500) {
+      if (checkFaceNear && _W * _H >= 23000 && _W * _H <= 26900) {
         screenshot();
       }
 
@@ -47,7 +47,7 @@ const DrawBox: React.FC<any> = ({ notShowFrame = false, checkFaceNear, fullDesc,
             style={{
               position: 'absolute',
               border: 'solid',
-              borderColor: boxColor,
+              borderColor: 'transparent',
               height: _H,
               width: _W,
               transform: `translate(${_X}px,${_Y}px)`,

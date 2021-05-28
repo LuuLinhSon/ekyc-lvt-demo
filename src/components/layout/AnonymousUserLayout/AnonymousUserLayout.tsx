@@ -38,10 +38,6 @@ const AnonymousUserLayout: React.FC = ({ children }) => {
     history.push(RoutesString.OrcFace);
   }
 
-  const toFaceCompare = () => {
-    history.push(RoutesString.FaceCompare);
-  }
-
   return (
     <div className="full-screen anonymous-layout">
       <div className="anonymous-layout-content">
@@ -49,9 +45,6 @@ const AnonymousUserLayout: React.FC = ({ children }) => {
           <div className="wrapper-button">
           <Button className="action-button" variant="contained" color="primary" onClick={toOrcFace}>
             OCR FACE
-          </Button>
-          <Button className="action-button" variant="contained" color="primary" onClick={toFaceCompare}>
-            FACE COMPARE
           </Button>
           </div>
           <div className="mt-5 mb-5">

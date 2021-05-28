@@ -89,9 +89,9 @@ const getParentCode = (parentValue: string, listParent: any, forDistrict: boolea
 const mapCardTypeToValue = (cardType: string) => {
   switch (cardType) {
     case 'OLD ID': 
-      return 'CMND cũ';
+      return 'CMND 9 số';
     case 'NEW ID': 
-      return 'CCCD mới';
+      return 'CCCD 12 số';
     case 'CHIP_ID':
       return 'CCCD gắn chip';
     case 'PASSPORT':
@@ -112,6 +112,9 @@ const EditKYCForm: React.FC<any> = (props) => {
   const [currentDistrictCode, setCurrentDistrictCode] = useState(null);
 
   const userInformation = stateAuthentication?.ocrInformation;
+  const cityCode = userInformation.provinceCode;
+  const districtCode = userInformation.districtCode;
+  const wardCode = userInformation.precinctCode;
   const [validation, setValidation] = useState({
     uniqueValue: {
       error: userInformation.idConfidence,
@@ -179,10 +182,6 @@ const EditKYCForm: React.FC<any> = (props) => {
       const listPrecinct = listArea.filter((item) => item.areaType === 'C').map((item) => {
         return { ...item, precinctName: item?.precinctName?.replace('Xã ', '')}
       });;
-
-      console.log('listCity', listCity);
-      console.log('listDistrict', listDistrict);
-      console.log('listPrecinct', listPrecinct);
       
       setListCity(listCity);
       setListDistrict(listDistrict);
@@ -331,7 +330,8 @@ const EditKYCForm: React.FC<any> = (props) => {
           <div className="header-container mt-3">
             <span className="header-container-header-text font-weight-bold">Địa chỉ thường trú</span>
           </div>
-          <span className="field-name mt-3">Tỉnh/Thành phố</span>
+          {!isEmpty(cityCode) && <div className="field-name my-3">{`Mã thành phố: ${cityCode}`}</div>}
+          <span className="field-name mt-1">Tỉnh/Thành phố</span>
           <FormControl variant="outlined" fullWidth={true} error={validation?.city?.error || errors.city === 'Required'}>
             <Select
               labelId="demo-simple-select-outlined-label"
@@ -353,7 +353,8 @@ const EditKYCForm: React.FC<any> = (props) => {
           </FormControl>
           <div className="block-row">
             <div className="w-50 pr-2">
-              <span className="field-name mt-5">Quận/Huyện</span>
+            {!isEmpty(districtCode) && <div className="field-name mt-3">{`Mã Quận/Huyện: ${districtCode}`}</div>}
+              <span className="field-name mt-1">Quận/Huyện</span>
               <FormControl variant="outlined" fullWidth={true} error={errors.district === 'Required'}>
                 <Select
                   labelId="demo-simple-select-outlined-label"
@@ -374,8 +375,9 @@ const EditKYCForm: React.FC<any> = (props) => {
                 <FormHelperText>{errors.district}</FormHelperText>
               </FormControl>
             </div>
-            <div className="w-50 pr-2">
-              <span className="field-name mt-5">Phường/Xã</span>
+            <div className="flex-column w-50 pr-2">
+            {!isEmpty(wardCode) && <div className="field-name mt-3">{`Mã Phường/Xã: ${wardCode}`}</div>}
+              <span className="field-name mt-1">Phường/Xã</span>
               <FormControl variant="outlined" fullWidth={true} error={errors.precinct === 'Required'}>
                 <Select
                   labelId="demo-simple-select-outlined-label"
@@ -407,6 +409,11 @@ const EditKYCForm: React.FC<any> = (props) => {
             name="addressLine"
             onChange={(e) => onHandleChange('addressLine', e)}
           />
+          <span className="field-name mt-3">{`Địa chỉ đầy đủ: ${values?.addressLine || ''} ${values?.precinct} - ${
+            values?.district
+          } - ${values?.city}
+          `}</span>
+
           <span className="field-name mt-3">Địa chỉ đầy đủ trên giấy tờ</span>
           <TextField
             value={values?.address}
@@ -417,11 +424,6 @@ const EditKYCForm: React.FC<any> = (props) => {
             name="address"
             onChange={(e) => onHandleChange('address', e)}
           />
-
-          <span className="field-name mt-3">{`Địa chỉ đầy đủ: ${values?.addressLine || ''} ${values?.precinct} - ${
-            values?.district
-          } - ${values?.city}
-          `}</span>
         </div>
         <Button
           disabled={!isEmpty(errors)}

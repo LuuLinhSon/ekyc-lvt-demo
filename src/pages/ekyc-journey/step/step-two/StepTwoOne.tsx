@@ -1,9 +1,9 @@
 import { Button } from '@material-ui/core';
 import RoutesString from 'pages/routesString';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import API from 'api';
-
+import ImageUploading from 'react-images-uploading';
 import Webcam from 'react-webcam';
 import useStepperStore from 'stores/StepperStore/stepper';
 
@@ -216,6 +216,7 @@ const redirectPage = (actionAuthentication: any, actionStepper: any, history: an
 };
 
 const StepTwoScreenshot: React.FC<any> = (props) => {
+  const [images, setImages] = useState<any>([]);
   const [, actionStoreAPI] = useStoreAPI();
   const webcamRef = useRef<Webcam>(null);
   const [stateStepper, actionStepper] = useStepperStore();
@@ -244,9 +245,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     });
   };
 
-  const captureFront = async () => {
+  const captureFront = async (isCapture: boolean) => {
     const imageSrc = await webcamRef?.current?.getScreenshot();
-    const base64 = imageSrc?.split(',')[1] || '';
+    const base64 = isCapture ? imageSrc?.split(',')[1] || '' : images[0]?.data_url.split(',')[1] || '';
 
     try {
       actionStoreAPI.setFetching(true);
@@ -275,9 +276,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         sign: get(ocrInformation, 'sign'),
         time: get(ocrInformation, 'time'),
         cardType: get(ocrInformation, 'cardType'),
-        provinceCode: get(ocrInformation, 'provinceCode'),
+        provinceCode: get(ocrInformation, 'cityCode'),
         districtCode: get(ocrInformation, 'districtCode'),
-        precinctCode: get(ocrInformation, 'precinctCode'),
+        precinctCode: get(ocrInformation, 'wardCode'),
         provinceDetail: {
           city: get(ocrInformation, 'provinceDetail.city'),
           district: get(ocrInformation, 'provinceDetail.district'),
@@ -324,9 +325,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     }
   };
 
-  const captureBack = async () => {
+  const captureBack = async (isCapture: boolean) => {
     const imageSrc = await webcamRef?.current?.getScreenshot();
-    const base64 = imageSrc?.split(',')[1] || '';
+    const base64 = isCapture ? imageSrc?.split(',')[1] || '' : images[0]?.data_url.split(',')[1] || '';
     const ekycId = stateAuthentication?.ekycId || '';
     try {
       actionStoreAPI.setFetching(true);
@@ -348,9 +349,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         sign: get(ocrInformation, 'sign'),
         time: get(ocrInformation, 'time'),
         cardType: get(ocrInformation, 'cardType'),
-        provinceCode: get(ocrInformation, 'provinceCode'),
+        provinceCode: get(ocrInformation, 'cityCode'),
         districtCode: get(ocrInformation, 'districtCode'),
-        precinctCode: get(ocrInformation, 'precinctCode'),
+        precinctCode: get(ocrInformation, 'wardCode'),
         provinceDetail: {
           city: get(ocrInformation, 'provinceDetail.city'),
           district: get(ocrInformation, 'provinceDetail.district'),
@@ -387,6 +388,10 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     }
   };
 
+  const onChange = (imageList) => {
+    setImages(imageList);
+  };
+
   return (
     <div className="container">
       {isCaptureFrontCMNDStep ? (
@@ -404,27 +409,83 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
           height: HEIGHT,
         }}
       >
-        <div style={{ position: 'relative', width: WIDTH }}>
-          <div style={{ position: 'absolute' }}>
-            <Webcam
-              audio={false}
-              width={WIDTH}
-              height={HEIGHT}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={true}
-            />
-          </div>
-        </div>
+        {
+          images.length === 0 ? (
+            <div style={{ position: 'relative', width: WIDTH }}>
+              <div style={{ position: 'absolute' }}>
+                <Webcam
+                  audio={false}
+                  width={WIDTH}
+                  height={HEIGHT}
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={true}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="wrapper-list-image">
+                {images?.map((image: any, index) => {
+                  console.log('imagesss', image);
+                  const dataUrl = image.data_url;
+                  return <div key={index} className="d-flex justify-content-center">
+                  <img src={dataUrl} className="d-block" alt="CMND" width={WIDTH} />
+                </div>
+                })}
+              </div>
+          )
+        }
+        
       </div>
-      <Button
-        className="next-button"
-        variant="contained"
-        color="primary"
-        onClick={isCaptureFrontCMNDStep ? captureFront : captureBack}
-      >
-        Chụp
-      </Button>
+      <div className="wrapper-button">
+        {
+          images.length === 0 ? (
+            <Button
+              className="next-button-capture"
+              variant="contained"
+              color="primary"
+              onClick={isCaptureFrontCMNDStep ? () => captureFront(true) : () => captureBack(true)}
+            >
+              Chụp
+            </Button>
+          ) : (
+            <Button
+              className="next-button-capture"
+              variant="contained"
+              color="primary"
+              onClick={isCaptureFrontCMNDStep ? () => captureFront(false) : () => captureBack(false)}
+            >
+              Gửi ảnh
+            </Button>
+          )
+        }
+        <ImageUploading
+            multiple
+            value={images}
+            onChange={onChange}
+            maxNumber={1}
+            dataURLKey="data_url"
+          >
+          {({
+            onImageUpload,
+            onImageRemoveAll,
+            dragProps,
+          }) => (
+            <>
+              {images.length === 0 &&
+              <Button className="next-button-capture" variant="contained" color="primary" onClick={onImageUpload} {...dragProps}>
+                Chọn ảnh
+              </Button>
+              }
+              {images.length !== 0 &&
+              <Button className="next-button-capture" variant="contained" color="primary" onClick={onImageRemoveAll} {...dragProps}>
+                Xóa ảnh
+              </Button>
+              }
+            </>
+          )}
+          </ImageUploading>
+      </div>
     </div>
   );
 };
