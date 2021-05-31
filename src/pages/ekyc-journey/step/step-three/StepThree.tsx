@@ -4,7 +4,7 @@ import { FaceDetection } from 'face-api.js/build/commonjs/classes/FaceDetection'
 import { FaceLandmarks68 } from 'face-api.js/build/commonjs/classes/FaceLandmarks68';
 import { WithFaceDescriptor } from 'face-api.js/build/commonjs/factories/WithFaceDescriptor';
 import { WithFaceLandmarks } from 'face-api.js/build/commonjs/factories/WithFaceLandmarks';
-import { getFullFaceDescription, loadModels } from '../../../../face-api/face';
+import { getFullFaceDescription } from '../../../../face-api/face';
 import { get, isEmpty, isNull } from 'lodash';
 import { useHistory, useLocation } from 'react-router-dom';
 import RoutesString from 'pages/routesString';
@@ -115,7 +115,7 @@ const getStepContent = (numberImg: number) => {
           <div>
             <span className="font-weight-bold">Bước 3-1</span>: Xác thực khuôn mặt xa
           </div>
-          <span className="text-center mt-2">Vui lòng đưa khuôn mặt ra xa vừa với khung màu vàng</span>
+          <span className="loading-info">Vui lòng đưa khuôn mặt tương ứng với khung màu vàng</span>
         </div>
       );
     case 1:
@@ -124,7 +124,7 @@ const getStepContent = (numberImg: number) => {
           <div>
             <span className="font-weight-bold">Bước 3-2</span>: Xác thực khuôn mặt gần
           </div>
-          <span className="text-center mt-2">Vui lòng để khuôn mặt lại gần vừa với khung màu vàng</span>
+          <span className="loading-info">Di chuyển khuôn mặt lại gần tương ứng với khung màu vàng</span>
         </div>
       );
     case 2:
@@ -133,7 +133,7 @@ const getStepContent = (numberImg: number) => {
           <div>
             <span className="font-weight-bold">Bước 3-3</span>: Đọc dãy số
           </div>
-          <span className="text-center mt-2">Vui lòng đọc chính xác dãy số sau</span>
+          <span className="loading-info">Vui lòng đọc chính xác dãy số sau</span>
         </div>
       );
     default:
@@ -146,7 +146,7 @@ const StepThree: React.FC<any> = (props) => {
   const history = useHistory();
   const location = useLocation();
   const [, actionStoreAPI] = useStoreAPI();
-  const [stateAuthentication] = useAuthentication();
+  const [stateAuthentication, actionAuthentication] = useAuthentication();
   const [stateStepper, actionStepper] = useStepperStore();
   const [imgsrc, setImgSrc] = useState<SourceLive[]>([]);
   const [isCheckFaceNear, setIsCheckFaceNear] = useState<boolean>(false);
@@ -163,7 +163,6 @@ const StepThree: React.FC<any> = (props) => {
   const numberVerifyList = stateAuthentication?.numberVerify?.split(',');
 
   useEffect(() => {
-    loadModels();
     setInputDevice();
 
     return () => clearInterval(timer);
@@ -208,12 +207,31 @@ const StepThree: React.FC<any> = (props) => {
               const verifyEKYCResponse = await verifyEKYC(audioLive, imgsrc, ekycId, stateAuthentication);
               const resultCode = get(verifyEKYCResponse, 'body.resultCode', '');
               const resultDesc = get(verifyEKYCResponse, 'body.resultDesc', '');
+              const actionError = get(verifyEKYCResponse, 'body.actionError', '');
+              console.log('actionError', actionError);
+
+              if (resultCode === 'ESM-0002') {
+                actionAuthentication.logout();
+                actionStepper.resetStepper();
+                history.push(RoutesString.StepOne, {});
+                notify.error(resultDesc);
+                return;
+              }
+
               if (resultCode === '0' || resultCode === 'EKYC-0010') {
                 history.push(RoutesString.StepFour);
                 actionStepper.setCurrentPathStep(RoutesString.StepFour);
                 actionStepper.nextStep();
                 return;
               }
+
+              if (resultCode !== '0' && actionError === 'NUMBER') {
+                reset();
+                start();
+                notify.error(resultDesc);
+                return;
+              }
+
               setImgSrc([]);
               setIsCheckFaceNear(false);
               reset();
@@ -288,12 +306,16 @@ const StepThree: React.FC<any> = (props) => {
   return (
     <div className="container">
       {getStepContent(imgsrc.length)}
-      {isEmpty(fullDesc) || isNull(fullDesc) ? (
+      {imgsrc.length === 2 ? null : isEmpty(fullDesc) || isNull(fullDesc) ? (
         <span className="loading">Đang tìm kiếm khuôn mặt</span>
       ) : fullDesc?.length > 1 ? (
         <span className="loading">Có quá nhiều người trong camera</span>
       ) : null}
-      {imgsrc.length === 2 && <span>{time}</span>}
+      {imgsrc.length === 2 && (
+        <span>
+          Bạn còn <span className="text-time">{time}</span> giây
+        </span>
+      )}
       <div
         style={{
           width: WIDTH,

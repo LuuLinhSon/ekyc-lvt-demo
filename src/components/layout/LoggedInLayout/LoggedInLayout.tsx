@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import LVT_LOGO from 'assets/images/lvt-img.png';
 import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
@@ -11,6 +11,7 @@ import './LoggedInLayout.scss';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import RoutesString from 'pages/routesString';
 import { useHistory } from 'react-router-dom';
+import { loadModels } from 'face-api/face';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,6 +43,11 @@ const LoggedLayout: React.FC = ({ children }) => {
     await actionStepper.resetStepper();
     history.push(RoutesString.StepOne, {});
   };
+
+  useEffect(() => {
+    loadModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="full-screen">
