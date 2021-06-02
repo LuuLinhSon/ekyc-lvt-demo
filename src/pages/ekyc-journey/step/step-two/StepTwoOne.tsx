@@ -456,7 +456,7 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
             Gửi ảnh
           </Button>
         )}
-        <ImageUploading multiple value={images} onChange={onChange} maxNumber={1} dataURLKey="data_url">
+        <ImageUploading multiple={true} value={images} onChange={onChange} maxNumber={1} dataURLKey="data_url">
           {({ onImageUpload, onImageRemoveAll, dragProps }) => (
             <>
               {images.length === 0 && (
