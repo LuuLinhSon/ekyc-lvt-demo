@@ -1,8 +1,8 @@
 {
   "name": "ekyc-lvt-demo",
   "version": "0.1.0",
-  "homepage": "https://ekycsanbox-lienviettech.netlify.app",
   "private": true,
+  "homepage": "https://ekycsanbox-lienviettech.netlify.app",
   "dependencies": {
     "@material-ui/core": "^4.11.4",
     "@material-ui/lab": "^4.0.0-alpha.58",
@@ -56,7 +56,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "start:prod": "env-cmd -f .env.production react-app-rewired start",
+    "start:prod": "PUBLIC_URL=https://ekycsanbox-lienviettech.netlify.app react-app-rewired start",
     "build": "react-app-rewired build",
     "build:prod": "PUBLIC_URL=https://ekycsanbox-lienviettech.netlify.app react-app-rewired build",
     "build-window:prod": "set \"GENERATE_SOURCEMAP=false\" && env-cmd -f .env.production react-app-rewired build",
