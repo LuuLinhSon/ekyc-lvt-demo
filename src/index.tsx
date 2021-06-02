@@ -14,7 +14,7 @@ import './styles/custom.scss';
 // }
 
 export default ReactDOM.render(
-  <Router basename={process.env.PUBLIC_URL}>
+  <Router>
     <QueryParamProvider ReactRouterRoute={Route}>
       <App />
     </QueryParamProvider>
