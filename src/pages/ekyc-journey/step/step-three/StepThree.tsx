@@ -107,7 +107,7 @@ const verifyEKYC = async (
   return verifyKYCResponse;
 };
 
-const getStepContent = (numberImg: number) => {
+const getStepContent = (numberImg: number, time: number) => {
   switch (numberImg) {
     case 0:
       return (
@@ -133,7 +133,7 @@ const getStepContent = (numberImg: number) => {
           <div>
             <span className="font-weight-bold">Bước 3-3</span>: Đọc dãy số
           </div>
-          <span className="loading-info">Vui lòng đọc chính xác dãy số sau</span>
+          {time !== 0 && <span className="loading-info">Vui lòng đọc chính xác dãy số sau</span>}
         </div>
       );
     default:
@@ -305,7 +305,7 @@ const StepThree: React.FC<any> = (props) => {
 
   return (
     <div className="container">
-      {getStepContent(imgsrc.length)}
+      {getStepContent(imgsrc.length, time)}
       {imgsrc.length === 2 ? null : isEmpty(fullDesc) || isNull(fullDesc) ? (
         <span className="loading">Đang tìm kiếm khuôn mặt</span>
       ) : fullDesc?.length > 1 ? (

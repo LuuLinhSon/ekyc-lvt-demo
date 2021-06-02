@@ -182,12 +182,12 @@ const EditKYCForm: React.FC<any> = (props) => {
         const listDistrict = listArea
           .filter((item) => item.areaType === 'D')
           .map((item) => {
-            return { ...item, districtName: item?.districtName?.replace('H.', '') };
+            return { ...item, districtName: item?.districtName?.replace(/H.|T\/X|Quận /, '') };
           });
         const listPrecinct = listArea
           .filter((item) => item.areaType === 'C')
           .map((item) => {
-            return { ...item, precinctName: item?.precinctName?.replace('Xã ', '') };
+            return { ...item, precinctName: item?.precinctName?.replace(/Xã |P.|T.Trấn |Thị Trấn /, '') };
           });
 
         setListCity(listCity);

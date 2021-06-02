@@ -118,6 +118,8 @@ const mapCardTypeToValue = (cardType: string) => {
       return 'CCCD gắn chip';
     case 'PASSPORT':
       return 'Hộ Chiếu';
+    case 'CCCD':
+      return 'CCCD';
     default:
       return '';
   }
@@ -177,7 +179,7 @@ const OrcFace: React.FC<any> = (props) => {
       actionStoreAPI.setFetching(true);
       const responseCheckOrc = await checkOrcImage(base64);
       const id = get(responseCheckOrc, 'id', '');
-      const document = get(responseCheckOrc, 'document', '').replaceAll(' ', '_');
+      const document = get(responseCheckOrc, 'document', '');
       const responseCheckOrcQuality = await checkOrcQualityImage(base64, id !== 'N/A', document);
       const isCorner = get(responseCheckOrc, 'id_check', '') === 'CORNER';
       const isPhotocopy = get(responseCheckOrc, 'id_check', '') === 'BW';
