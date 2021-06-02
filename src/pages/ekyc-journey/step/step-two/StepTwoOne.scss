@@ -21,9 +21,18 @@
     font-size: 14px;
   }
 
-  .next-button {
-    height: fit-content;
-    width: 100px;
+  .next-button-capture {
+    width: 200px;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+
+  .wrapper-button {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
     margin-top: 40px;
   }
 }

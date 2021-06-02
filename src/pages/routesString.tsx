@@ -16,6 +16,8 @@ const StepEditKYC = lazy(() => import('./ekyc-journey/step/step-two/StepEditKyc'
 const StepThreeOne = lazy(() => import('./ekyc-journey/step/step-three/StepThree'));
 const StepThreeTwo = lazy(() => import('./ekyc-journey/step/step-three/StepThree'));
 const StepFour = lazy(() => import('./ekyc-journey/step/step-four/StepFour'));
+const OrcFace = lazy(() => import('./orc-face/OrcFace'));
+const FaceCompare = lazy(() => import('./face-compare/FaceCompare'));
 
 export const Pages = {
   Login,
@@ -32,6 +34,8 @@ export const Pages = {
   StepThreeOne,
   StepThreeTwo,
   StepFour,
+  OrcFace,
+  FaceCompare
 };
 
 const RoutesString = {
@@ -49,6 +53,8 @@ const RoutesString = {
   TermAndConditions: `/${PUBLIC_PAGES.NAME.TAC}`,
   AccessDenied: `/${PUBLIC_PAGES.NAME.ACCESS_DENIED}`,
   Main: `/${ENTITIES.PATH.MAIN}`,
+  OrcFace: `/${PUBLIC_PAGES.NAME.ORC_FACE}`,
+  FaceCompare: `/${PUBLIC_PAGES.NAME.FACE_COMPARE}`,
 };
 
 export default RoutesString;

@@ -2,10 +2,23 @@
 
 .anonymous-layout {
   display: flex;
-  // justify-content: center;
   align-items: center;
 
+  .wrapper-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+
+    .action-button {
+      width: 150px;
+      margin: 5px;
+    }
+  }
+
   &-content {
-    width: 39%;
+    width: 50%;
   }
 }

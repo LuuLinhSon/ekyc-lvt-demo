@@ -1,9 +1,9 @@
 import { Button } from '@material-ui/core';
 import RoutesString from 'pages/routesString';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import API from 'api';
-
+import ImageUploading from 'react-images-uploading';
 import Webcam from 'react-webcam';
 import useStepperStore from 'stores/StepperStore/stepper';
 
@@ -11,8 +11,9 @@ import './StepTwoOne.scss';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { get, isEmpty, omit } from 'lodash';
 import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
-import { useAlert } from 'react-alert';
+// import { useAlert } from 'react-alert';
 import { useStoreAPI } from 'api/storeAPI';
+import { notify } from 'components/toast/Toast';
 
 const sha1 = require('js-sha1');
 
@@ -54,7 +55,7 @@ const initEKYC = async (stateAuthentication: AuthenticationStates) => {
     'Access-Control-Allow-Origin': '*',
   };
   const initEKYCResponse = await API({
-    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
     method: 'POST',
     headers,
     data: {
@@ -97,7 +98,7 @@ const ocrFrontEKYC = async (base64: string, ekycId: string, stateAuthentication:
     'Access-Control-Allow-Origin': '*',
   };
   const ocrFrontResponse = await API({
-    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
     method: 'POST',
     headers,
     data: {
@@ -141,7 +142,7 @@ const ocrFrontEKYC = async (base64: string, ekycId: string, stateAuthentication:
 };
 
 const checkConfidence = (confidence: string) => {
-  return confidence === 'Y' ? true : false;
+  return confidence === 'Y' ? false : true;
 };
 
 const ocrBackEKYC = async (base64: string, ekycId: string, stateAuthentication: AuthenticationStates) => {
@@ -151,7 +152,7 @@ const ocrBackEKYC = async (base64: string, ekycId: string, stateAuthentication: 
     'Access-Control-Allow-Origin': '*',
   };
   const ocrFrontResponse = await API({
-    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
     method: 'POST',
     headers,
     data: {
@@ -210,23 +211,20 @@ const redirectPage = (actionAuthentication: any, actionStepper: any, history: an
     }
     case 'OCR_BACK_IMAGE':
       return actionAuthentication.setActionError('OCR_BACK_IMAGE');
-    default: {
-      actionStepper.setCurrentPathStep(RoutesString.StepTwoTwo);
-      history.push(RoutesString.StepTwoTwo);
-      actionAuthentication.setActionError('ALL');
+    default:
       return;
-    }
   }
 };
 
 const StepTwoScreenshot: React.FC<any> = (props) => {
+  const [images, setImages] = useState<any>([]);
   const [, actionStoreAPI] = useStoreAPI();
   const webcamRef = useRef<Webcam>(null);
   const [stateStepper, actionStepper] = useStepperStore();
   const [stateAuthentication, actionAuthentication] = useAuthentication();
   const history = useHistory();
   const location = useLocation();
-  const alert = useAlert();
+  // const alert = useAlert();
 
   const isCaptureFrontCMNDStep = location?.pathname === RoutesString.StepTwoTwo;
 
@@ -248,9 +246,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
     });
   };
 
-  const captureFront = async () => {
+  const captureFront = async (isCapture: boolean) => {
     const imageSrc = await webcamRef?.current?.getScreenshot();
-    const base64 = imageSrc?.split(',')[1] || '';
+    const base64 = isCapture ? imageSrc?.split(',')[1] || '' : images[0]?.data_url.split(',')[1] || '';
 
     try {
       actionStoreAPI.setFetching(true);
@@ -279,11 +277,14 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         sign: get(ocrInformation, 'sign'),
         time: get(ocrInformation, 'time'),
         cardType: get(ocrInformation, 'cardType'),
+        provinceCode: get(ocrInformation, 'cityCode'),
+        districtCode: get(ocrInformation, 'districtCode'),
+        precinctCode: get(ocrInformation, 'wardCode'),
         provinceDetail: {
           city: get(ocrInformation, 'provinceDetail.city'),
           district: get(ocrInformation, 'provinceDetail.district'),
           precinct: get(ocrInformation, 'provinceDetail.precinct'),
-          street: get(ocrInformation, 'provinceDetail.street'),
+          streetName: get(ocrInformation, 'provinceDetail.streetName'),
         },
         nameConfidence: checkConfidence(get(ocrInformation, 'nameConfidence')),
         idConfidence: checkConfidence(get(ocrInformation, 'idConfidence')),
@@ -302,12 +303,14 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         (resultCode === '0' && stateAuthentication.actionError === 'ALL') ||
         (resultCode === '0' && stateAuthentication.actionError === null)
       ) {
+        actionAuthentication.setActionError(null);
         history.push(RoutesString.StepTwoThree);
         actionStepper.setCurrentPathStep(RoutesString.StepTwoThree);
         return;
       }
 
       if (resultCode === '0' && stateAuthentication.actionError === 'OCR_FRONT_IMAGE') {
+        actionAuthentication.setActionError(null);
         actionAuthentication.setOcrInformation(ocrInformationByType);
         history.push(RoutesString.StepEditKYC);
         actionStepper.setCurrentPathStep(RoutesString.StepEditKYC);
@@ -315,17 +318,17 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
       }
 
       actionAuthentication.setActionError(isEmpty(actionError) ? null : actionError);
-
-      return alert.error(resultDesc);
+      notify.error(resultDesc);
     } catch (e) {
+      notify.error('Đã xảy ra lỗi vui lòng thử lại');
     } finally {
       actionStoreAPI.setFetching(false);
     }
   };
 
-  const captureBack = async () => {
+  const captureBack = async (isCapture: boolean) => {
     const imageSrc = await webcamRef?.current?.getScreenshot();
-    const base64 = imageSrc?.split(',')[1] || '';
+    const base64 = isCapture ? imageSrc?.split(',')[1] || '' : images[0]?.data_url.split(',')[1] || '';
     const ekycId = stateAuthentication?.ekycId || '';
     try {
       actionStoreAPI.setFetching(true);
@@ -347,11 +350,14 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         sign: get(ocrInformation, 'sign'),
         time: get(ocrInformation, 'time'),
         cardType: get(ocrInformation, 'cardType'),
+        provinceCode: get(ocrInformation, 'cityCode'),
+        districtCode: get(ocrInformation, 'districtCode'),
+        precinctCode: get(ocrInformation, 'wardCode'),
         provinceDetail: {
           city: get(ocrInformation, 'provinceDetail.city'),
           district: get(ocrInformation, 'provinceDetail.district'),
           precinct: get(ocrInformation, 'provinceDetail.precinct'),
-          street: get(ocrInformation, 'provinceDetail.street'),
+          streetName: get(ocrInformation, 'provinceDetail.streetName'),
         },
         nameConfidence: checkConfidence(get(ocrInformation, 'nameConfidence')),
         idConfidence: checkConfidence(get(ocrInformation, 'idConfidence')),
@@ -375,11 +381,16 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
 
       await redirectPage(actionAuthentication, actionStepper, history, actionError);
 
-      return alert.error(resultDesc);
+      notify.error(resultDesc);
     } catch (e) {
+      notify.error('Đã xảy ra lỗi vui lòng thử lại');
     } finally {
       actionStoreAPI.setFetching(false);
     }
+  };
+
+  const onChange = (imageList) => {
+    setImages(imageList);
   };
 
   return (
@@ -399,27 +410,81 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
           height: HEIGHT,
         }}
       >
-        <div style={{ position: 'relative', width: WIDTH }}>
-          <div style={{ position: 'absolute' }}>
-            <Webcam
-              audio={false}
-              width={WIDTH}
-              height={HEIGHT}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={true}
-            />
+        {images.length === 0 ? (
+          <div style={{ position: 'relative', width: WIDTH }}>
+            <div style={{ position: 'absolute' }}>
+              <Webcam
+                audio={false}
+                width={WIDTH}
+                height={HEIGHT}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={true}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="wrapper-list-image">
+            {images?.map((image: any, index) => {
+              const dataUrl = image.data_url;
+              return (
+                <div key={index} className="d-flex justify-content-center">
+                  <img src={dataUrl} className="d-block" alt="CMND" width={WIDTH} />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
-      <Button
-        className="next-button"
-        variant="contained"
-        color="primary"
-        onClick={isCaptureFrontCMNDStep ? captureFront : captureBack}
-      >
-        Chụp
-      </Button>
+      <div className="wrapper-button">
+        {images.length === 0 ? (
+          <Button
+            className="next-button-capture"
+            variant="contained"
+            color="primary"
+            onClick={isCaptureFrontCMNDStep ? () => captureFront(true) : () => captureBack(true)}
+          >
+            Chụp
+          </Button>
+        ) : (
+          <Button
+            className="next-button-capture"
+            variant="contained"
+            color="primary"
+            onClick={isCaptureFrontCMNDStep ? () => captureFront(false) : () => captureBack(false)}
+          >
+            Gửi ảnh
+          </Button>
+        )}
+        <ImageUploading multiple value={images} onChange={onChange} maxNumber={1} dataURLKey="data_url">
+          {({ onImageUpload, onImageRemoveAll, dragProps }) => (
+            <>
+              {images.length === 0 && (
+                <Button
+                  className="next-button-capture"
+                  variant="contained"
+                  color="primary"
+                  onClick={onImageUpload}
+                  {...dragProps}
+                >
+                  Chọn ảnh
+                </Button>
+              )}
+              {images.length !== 0 && (
+                <Button
+                  className="next-button-capture"
+                  variant="contained"
+                  color="primary"
+                  onClick={onImageRemoveAll}
+                  {...dragProps}
+                >
+                  Xóa ảnh
+                </Button>
+              )}
+            </>
+          )}
+        </ImageUploading>
+      </div>
     </div>
   );
 };

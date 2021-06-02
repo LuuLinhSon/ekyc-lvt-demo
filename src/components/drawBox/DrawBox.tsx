@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-const WIDTH_MAX_BOX = 246;
-const HEIGHT_MAX_BOX = 238;
-const X_MAX_BOX = 86;
+const WIDTH_MAX_BOX = 160;
+const HEIGHT_MAX_BOX = 200;
+const X_MAX_BOX = 136;
 const Y_MAX_BOX = 65;
 
-const WIDTH_MIN_BOX = 120;
-const HEIGHT_MIN_BOX = 96;
+const WIDTH_MIN_BOX = 130;
+const HEIGHT_MIN_BOX = 150;
 const X_MIN_BOX = 159;
 const Y_MIN_BOX = 80;
 
-const DrawBox: React.FC<any> = ({ checkFaceNear, fullDesc, imageWidth, boxColor, screenshot }) => {
+const DrawBox: React.FC<any> = ({ notShowFrame = false, checkFaceNear, fullDesc, imageWidth, boxColor, screenshot }) => {
   const [detections, setDetections] = useState<any>(null);
   let box = null;
 
@@ -33,11 +33,11 @@ const DrawBox: React.FC<any> = ({ checkFaceNear, fullDesc, imageWidth, boxColor,
       const _W = imageWidth * relativeBox.width;
       const _H = (relativeBox.height * imageWidth * dimension._height) / dimension._width;
 
-      if (checkFaceNear && _W * _H >= 40000 && _W * _H <= 58310) {
+      if (checkFaceNear && _W * _H >= 23000 && _W * _H <= 26900) {
         screenshot();
       }
 
-      if (!checkFaceNear && _W * _H >= 12000 && _W * _H <= 13520) {
+      if (checkFaceNear === false && _W * _H >= 12500 && _W * _H <= 15520) {
         screenshot();
       }
 
@@ -47,7 +47,7 @@ const DrawBox: React.FC<any> = ({ checkFaceNear, fullDesc, imageWidth, boxColor,
             style={{
               position: 'absolute',
               border: 'solid',
-              borderColor: boxColor,
+              borderColor: 'transparent',
               height: _H,
               width: _W,
               transform: `translate(${_X}px,${_Y}px)`,
@@ -61,7 +61,7 @@ const DrawBox: React.FC<any> = ({ checkFaceNear, fullDesc, imageWidth, boxColor,
   return (
     <div>
       {box}
-      <div>
+      {!notShowFrame && <div>
         {checkFaceNear ? (
           <div
             style={{
@@ -85,7 +85,7 @@ const DrawBox: React.FC<any> = ({ checkFaceNear, fullDesc, imageWidth, boxColor,
             }}
           />
         )}
-      </div>
+      </div>}
     </div>
   );
 };

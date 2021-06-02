@@ -47,11 +47,14 @@ interface OcrInformation {
   sign: string;
   time: string;
   cardType: string;
+  provinceCode: string;
+  districtCode: string;
+  precinctCode: string;
   provinceDetail: {
     city: string;
     district: string;
     precinct: string;
-    street: string;
+    streetName: string;
   };
   nameConfidence: boolean;
   idConfidence: boolean;

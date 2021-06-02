@@ -4,11 +4,11 @@ import StepEditKYCForm from './StepEditKYCForm';
 import API from 'api';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
 import { get } from 'lodash';
-import { useAlert } from 'react-alert';
 import RoutesString from 'pages/routesString';
 import useStepperStore from 'stores/StepperStore/stepper';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useStoreAPI } from 'api/storeAPI';
+import { notify } from 'components/toast/Toast';
 
 const YYYYMMDDHHMMSS = () => {
   const date = new Date();
@@ -35,14 +35,14 @@ const pad = (num: any, length: any) => {
   return str;
 };
 
-const ocrEditEKYC = async (dataInfo: {}, ekycId: string, stateAuthentication: AuthenticationStates) => {
+export const ocrEditEKYC = async (dataInfo: {}, ekycId: string, stateAuthentication: AuthenticationStates) => {
   const timestamp = new Date().getTime();
   const clientTime = getDate();
   const headers = {
     'Access-Control-Allow-Origin': '*',
   };
   const ocrFrontResponse = await API({
-    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
     method: 'POST',
     headers,
     data: {
@@ -80,13 +80,18 @@ const ocrEditEKYC = async (dataInfo: {}, ekycId: string, stateAuthentication: Au
   return ocrFrontResponse;
 };
 
+const convertDateOutput = (date: string) => {
+  const [year, month, day] = date.split('-');
+
+  return `${day}/${month}/${year}`;
+};
+
 const StepEditKYC: React.FC<any> = (props) => {
   const [, actionStoreAPI] = useStoreAPI();
   const history = useHistory();
   const location = useLocation();
   const [stateStepper, actionStepper] = useStepperStore();
   const [stateAuthentication] = useAuthentication();
-  const alert = useAlert();
 
   useEffect(() => {
     const isCurrentPage = stateStepper.currentPathStep === location?.pathname;
@@ -102,10 +107,10 @@ const StepEditKYC: React.FC<any> = (props) => {
       fullAddress: `${values?.addressLine || ''}, ${values?.precinct} - ${values?.district} - ${values?.city}`,
       uniqueId: '1',
       uniqueValue: values.uniqueValue,
-      dateOfIssue: values.dateOfIssue,
+      dateOfIssue: convertDateOutput(values.dateOfIssue),
       placeOfIssue: values.placeOfIssue,
-      birthDate: values.birthDate,
-      gender: values.gender,
+      birthDate: convertDateOutput(values.birthDate),
+      gender: values.gender === 'Nam' ? '1' : '0',
       email: values.email,
       placeId: '240',
       addressLine: values.addressLine,
@@ -125,9 +130,12 @@ const StepEditKYC: React.FC<any> = (props) => {
         return;
       }
 
+      notify.error(resultDesc);
+    } catch (e) {
+      notify.error('Đã xảy ra lỗi vui lòng thử lại');
+    } finally {
       actionStoreAPI.setFetching(false);
-      return alert.error(resultDesc);
-    } catch (e) {}
+    }
   };
 
   return <StepEditKYCForm handleSubmit={handleSubmit} />;

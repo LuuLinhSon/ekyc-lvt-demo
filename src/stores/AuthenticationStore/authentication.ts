@@ -8,6 +8,7 @@ import databases from 'cache';
 // import publicIp from 'public-ip';
 import { get } from 'lodash';
 import { storeKeyStepper } from 'stores/StepperStore/stepper';
+import { notify } from 'components/toast/Toast';
 
 export const AUTHENTICATION_STORE = 'StoreAuthentication';
 type StoreApi = StoreActionApi<AuthenticationStates>;
@@ -45,7 +46,7 @@ export const requestLogin = async (phone: string, password: string) => {
     'Access-Control-Allow-Origin': '*',
   };
   const response = await API({
-    url: 'https://stbsandbox.viviet.vn/transaction-service/rest/web/request',
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
     method: 'POST',
     headers,
     data: {
@@ -100,7 +101,7 @@ export const actions = {
       setState({ ...prevState, ekycId });
     },
   setActionError:
-    (actionError: string) =>
+    (actionError: string | null) =>
     ({ setState, getState }: StoreApi) => {
       const prevState = getState();
       setState({ ...prevState, actionError });
@@ -120,13 +121,14 @@ export const actions = {
       }
     },
   login:
-    (values: any, alert: any, actionStoreAPI: any) =>
+    (values: any, actionStoreAPI: any) =>
     async ({ setState, getState }: StoreApi) => {
       const prevState = getState();
       try {
         actionStoreAPI.setFetching(true);
         const response = await requestLogin(values.phone, values.password);
         const resultCode = get(response, 'body.resultCode', '');
+        const resultDesc = get(response, 'body.resultDesc', '');
         if (resultCode === '0') {
           setState({
             ...prevState,
@@ -159,7 +161,7 @@ export const actions = {
             loggedIn: true,
           });
 
-          alert.success('Đăng nhập thành công');
+          notify.success('Đăng nhập thành công');
           return;
         }
 
@@ -168,12 +170,13 @@ export const actions = {
           loggedIn: false,
         });
 
-        return alert.error('Thông tin đăng nhập không đúng');
+        notify.error(resultDesc);
       } catch (e) {
         setState({
           ...prevState,
           loggedIn: false,
         });
+        notify.error('Đã xảy ra lỗi vui lòng thử lại');
       } finally {
         actionStoreAPI.setFetching(false);
       }
@@ -216,9 +219,9 @@ export const initialState: AuthenticationStates = {
   ocrInformation: {
     name: '',
     id: '',
+    address: '',
     brithDay: '',
     province: '',
-    address: '',
     people: '',
     expireDate: '',
     issueDate: '',
@@ -226,11 +229,14 @@ export const initialState: AuthenticationStates = {
     sign: '',
     time: '',
     cardType: '',
+    provinceCode: '',
+    districtCode: '',
+    precinctCode: '',
     provinceDetail: {
       city: '',
       district: '',
       precinct: '',
-      street: '',
+      streetName: '',
     },
     nameConfidence: false,
     idConfidence: false,
