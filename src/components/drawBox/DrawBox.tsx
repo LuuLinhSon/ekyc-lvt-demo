@@ -9,7 +9,14 @@ const HEIGHT_MIN_BOX = 150;
 const X_MIN_BOX = 159;
 const Y_MIN_BOX = 80;
 
-const DrawBox: React.FC<any> = ({ notShowFrame = false, checkFaceNear, fullDesc, imageWidth, boxColor, screenshot }) => {
+const DrawBox: React.FC<any> = ({
+  notShowFrame = false,
+  checkFaceNear,
+  fullDesc,
+  imageWidth,
+  boxColor,
+  screenshot,
+}) => {
   const [detections, setDetections] = useState<any>(null);
   let box = null;
 
@@ -33,11 +40,11 @@ const DrawBox: React.FC<any> = ({ notShowFrame = false, checkFaceNear, fullDesc,
       const _W = imageWidth * relativeBox.width;
       const _H = (relativeBox.height * imageWidth * dimension._height) / dimension._width;
 
-      if (checkFaceNear && _W * _H >= 23000 && _W * _H <= 26900) {
+      if (checkFaceNear && _W * _H >= 23000) {
         screenshot();
       }
 
-      if (checkFaceNear === false && _W * _H >= 12500 && _W * _H <= 15520) {
+      if (checkFaceNear === false && _W * _H <= 15520) {
         screenshot();
       }
 
@@ -61,31 +68,35 @@ const DrawBox: React.FC<any> = ({ notShowFrame = false, checkFaceNear, fullDesc,
   return (
     <div>
       {box}
-      {!notShowFrame && <div>
-        {checkFaceNear ? (
-          <div
-            style={{
-              position: 'absolute',
-              border: 'solid',
-              borderColor: 'yellow',
-              height: HEIGHT_MAX_BOX,
-              width: WIDTH_MAX_BOX,
-              transform: `translate(${X_MAX_BOX}px,${Y_MAX_BOX}px)`,
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              position: 'absolute',
-              border: 'solid',
-              borderColor: 'yellow',
-              height: HEIGHT_MIN_BOX,
-              width: WIDTH_MIN_BOX,
-              transform: `translate(${X_MIN_BOX}px,${Y_MIN_BOX}px)`,
-            }}
-          />
-        )}
-      </div>}
+      {!notShowFrame && (
+        <div>
+          {checkFaceNear ? (
+            <div
+              style={{
+                position: 'absolute',
+                border: 'solid',
+                borderRadius: '50%',
+                borderColor: 'yellow',
+                height: HEIGHT_MAX_BOX,
+                width: WIDTH_MAX_BOX,
+                transform: `translate(${X_MAX_BOX}px,${Y_MAX_BOX}px)`,
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                position: 'absolute',
+                border: 'solid',
+                borderColor: 'yellow',
+                borderRadius: '50%',
+                height: HEIGHT_MIN_BOX,
+                width: WIDTH_MIN_BOX,
+                transform: `translate(${X_MIN_BOX}px,${Y_MIN_BOX}px)`,
+              }}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -208,7 +208,6 @@ const StepThree: React.FC<any> = (props) => {
               const resultCode = get(verifyEKYCResponse, 'body.resultCode', '');
               const resultDesc = get(verifyEKYCResponse, 'body.resultDesc', '');
               const actionError = get(verifyEKYCResponse, 'body.actionError', '');
-              console.log('actionError', actionError);
 
               if (resultCode === 'ESM-0002') {
                 actionAuthentication.logout();
@@ -306,11 +305,11 @@ const StepThree: React.FC<any> = (props) => {
   return (
     <div className="container">
       {getStepContent(imgsrc.length, time)}
-      {imgsrc.length === 2 ? null : isEmpty(fullDesc) || isNull(fullDesc) ? (
+      {/* {imgsrc.length === 2 ? null : isEmpty(fullDesc) || isNull(fullDesc) ? (
         <span className="loading">Đang tìm kiếm khuôn mặt</span>
       ) : fullDesc?.length > 1 ? (
         <span className="loading">Có quá nhiều người trong camera</span>
-      ) : null}
+      ) : null} */}
       {imgsrc.length === 2 && (
         <span>
           Bạn còn <span className="text-time">{time}</span> giây
@@ -344,7 +343,7 @@ const StepThree: React.FC<any> = (props) => {
                   videoConstraints={true}
                 />
               </div>
-              {fullDesc ? (
+              {/* {fullDesc ? (
                 <DrawBox
                   checkFaceNear={null}
                   fullDesc={fullDesc}
@@ -353,7 +352,7 @@ const StepThree: React.FC<any> = (props) => {
                   boxColor={'blue'}
                   notShowFrame={true}
                 />
-              ) : null}
+              ) : null} */}
             </div>
           </div>
         ) : (
@@ -368,7 +367,7 @@ const StepThree: React.FC<any> = (props) => {
                 videoConstraints={true}
               />
             </div>
-            {fullDesc && imgsrc.length < 2 ? (
+            {imgsrc.length < 2 ? (
               <DrawBox
                 checkFaceNear={isCheckFaceNear}
                 fullDesc={fullDesc}
