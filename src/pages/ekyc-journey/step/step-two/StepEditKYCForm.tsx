@@ -2,9 +2,7 @@ import { Button, FormControl, FormHelperText, MenuItem, Select, TextField } from
 import { Form, withFormik, FormikBag } from 'formik';
 import { get, isEmpty } from 'lodash';
 import React, { useEffect, useState } from 'react';
-import API from 'api';
 import useAuthentication from 'stores/AuthenticationStore/authentication';
-import { AuthenticationStates } from 'stores/AuthenticationStore/authenticationType';
 import './StepEditKycForm.scss';
 import { useStoreAPI } from 'api/storeAPI';
 import { notify } from 'components/toast/Toast';
@@ -13,73 +11,6 @@ const convertDateInput = (date: string) => {
   const [day, month, year] = date.split('/');
 
   return `${year}-${month}-${day}`;
-};
-
-const YYYYMMDDHHMMSS = () => {
-  const date = new Date();
-  const yyyy = date.getFullYear().toString();
-  const MM = pad(date.getMonth() + 1, 2);
-  const dd = pad(date.getDate(), 2);
-  const hh = pad(date.getHours(), 2);
-  const mm = pad(date.getMinutes(), 2);
-  const ss = pad(date.getSeconds(), 2);
-  const ms = pad(date.getMilliseconds(), 3);
-
-  return `${yyyy}${MM}${dd}${hh}${mm}${ss}.${ms}`;
-};
-
-const getDate = () => {
-  return YYYYMMDDHHMMSS();
-};
-
-const pad = (num: any, length: any) => {
-  let str = `${num}`;
-  while (str.length < length) {
-    str = `0${str}`;
-  }
-  return str;
-};
-
-export const getListArea = async (stateAuthentication: AuthenticationStates) => {
-  const timestamp = new Date().getTime();
-  const clientTime = getDate();
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-  };
-  const listAreaResponse = await API({
-    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
-    method: 'POST',
-    headers,
-    data: {
-      clientHeader: {
-        language: 'VN',
-        clientRequestId: `${timestamp}`,
-        deviceId: 'TESTDEMO',
-        clientAddress: '192.168.201.140',
-        platform: 'LOCAL',
-        function: 'getListArea',
-      },
-      body: {
-        header: {
-          platform: 'LOCAL',
-          clientRequestId: `${timestamp}`,
-          clientTime,
-          zonedClientTime: `${timestamp}`,
-          channelCode: 'WEBVIVIET',
-          deviceId: 'TESTDEMO',
-          sessionId: stateAuthentication.session.sessionId,
-          userId: stateAuthentication.session.userId,
-          authorizedMode: 0,
-          checkerMode: 0,
-          ip: '192.168.201.140',
-          makerId: 'SONLL',
-          language: 'VN',
-        },
-      },
-    },
-  });
-
-  return listAreaResponse;
 };
 
 const getParentCode = (parentValue: string, listParent: any, forDistrict: boolean) => {
@@ -114,6 +45,7 @@ const EditKYCForm: React.FC<any> = (props) => {
   const [currentCityCode, setCurrentCityCode] = useState(null);
   const [currentDistrictCode, setCurrentDistrictCode] = useState(null);
 
+  const listArea = stateAuthentication?.listArea;
   const userInformation = stateAuthentication?.ocrInformation;
   const cityCode = userInformation.provinceCode;
   const districtCode = userInformation.districtCode;
@@ -176,17 +108,15 @@ const EditKYCForm: React.FC<any> = (props) => {
     const initForm = async function () {
       try {
         actionStoreAPI.setFetching(true);
-        const response = await getListArea(stateAuthentication);
-        const listArea = get(response, 'body.area', []);
-        const listCity = listArea.filter((item) => item.areaType === 'P');
-        const listDistrict = listArea
-          .filter((item) => item.areaType === 'D')
-          .map((item) => {
+        const listCity = listArea?.filter((item: any) => item?.areaType === 'P');
+        const listDistrict: any = listArea
+          ?.filter((item: any) => item?.areaType === 'D')
+          ?.map((item: any) => {
             return { ...item, districtName: item?.districtName?.replace(/H.|T\/X|Quận /, '') };
           });
-        const listPrecinct = listArea
-          .filter((item) => item.areaType === 'C')
-          .map((item) => {
+        const listPrecinct: any = listArea
+          ?.filter((item: any) => item?.areaType === 'C')
+          ?.map((item: any) => {
             return { ...item, precinctName: item?.precinctName?.replace(/Xã |P.|T.Trấn |Thị Trấn /, '') };
           });
 

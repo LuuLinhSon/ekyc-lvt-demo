@@ -44,7 +44,7 @@ const DrawBox: React.FC<any> = ({
         screenshot();
       }
 
-      if (checkFaceNear === false && _W * _H <= 15520) {
+      if (checkFaceNear === false && _W * _H <= 18520) {
         screenshot();
       }
 

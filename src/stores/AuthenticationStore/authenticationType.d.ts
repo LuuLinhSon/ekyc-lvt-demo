@@ -75,6 +75,7 @@ interface AuthenticationStates {
   customer: CustomerState;
   session: SessionState;
   ocrInformation: OcrInformation;
+  listArea: [];
   ekycId: string | null;
   actionError: string | null;
   numberVerify: string | null;
