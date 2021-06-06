@@ -142,7 +142,7 @@ const ocrFrontEKYC = async (base64: string, ekycId: string, stateAuthentication:
 };
 
 const checkConfidence = (confidence: string) => {
-  return confidence === 'Y' ? false : true;
+  return confidence === null ? false : confidence === 'Y' ? false : true;
 };
 
 const ocrBackEKYC = async (base64: string, ekycId: string, stateAuthentication: AuthenticationStates) => {
@@ -254,6 +254,9 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
       actionStoreAPI.setFetching(true);
       const initEKYCResponse = await initEKYC(stateAuthentication);
       const ekycId = get(initEKYCResponse, 'body.ekycId', '');
+      const resultDescInit = get(initEKYCResponse, 'body.resultDesc', '');
+      const resultCodeInit = get(initEKYCResponse, 'body.resultCode', '');
+      if (resultCodeInit !== '0') return notify.error(resultDescInit);
       const paramsNumberVerify = get(initEKYCResponse, 'body.params', []).find(
         (element) => element.key === 'A3_LIST_NUMBER',
       );
@@ -294,7 +297,7 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         peopleConfidence: checkConfidence(get(ocrInformation, 'peopleConfidence')),
         expireDateConfidence: checkConfidence(get(ocrInformation, 'expireDateConfidence')),
         issueDateConfidence: checkConfidence(get(ocrInformation, 'issueDateConfidence')),
-        sexConfidence: checkConfidence(get(ocrInformation, 'sexConfidence')),
+        sexConfidence: checkConfidence(get(ocrInformation, 'sexConfidence', null)),
         signConfidence: checkConfidence(get(ocrInformation, 'signConfidence')),
         timeConfidence: checkConfidence(get(ocrInformation, 'timeConfidence')),
       };
@@ -367,7 +370,7 @@ const StepTwoScreenshot: React.FC<any> = (props) => {
         peopleConfidence: checkConfidence(get(ocrInformation, 'peopleConfidence')),
         expireDateConfidence: checkConfidence(get(ocrInformation, 'expireDateConfidence')),
         issueDateConfidence: checkConfidence(get(ocrInformation, 'issueDateConfidence')),
-        sexConfidence: checkConfidence(get(ocrInformation, 'sexConfidence')),
+        sexConfidence: checkConfidence(get(ocrInformation, 'sexConfidence', null)),
         signConfidence: checkConfidence(get(ocrInformation, 'signConfidence')),
         timeConfidence: checkConfidence(get(ocrInformation, 'timeConfidence')),
       };

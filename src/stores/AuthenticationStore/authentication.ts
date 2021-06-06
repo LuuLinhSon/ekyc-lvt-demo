@@ -81,6 +81,48 @@ export const requestLogin = async (phone: string, password: string) => {
   return response;
 };
 
+export const getListArea = async (sessionId: string, userId: string) => {
+  const timestamp = new Date().getTime();
+  const clientTime = getDate();
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+  };
+  const listAreaResponse = await API({
+    url: 'https://ekycsandbox.lienviettech.vn/lv24/rest/web/request',
+    method: 'POST',
+    headers,
+    data: {
+      clientHeader: {
+        language: 'VN',
+        clientRequestId: `${timestamp}`,
+        deviceId: 'TESTDEMO',
+        clientAddress: '192.168.201.140',
+        platform: 'LOCAL',
+        function: 'getListArea',
+      },
+      body: {
+        header: {
+          platform: 'LOCAL',
+          clientRequestId: `${timestamp}`,
+          clientTime,
+          zonedClientTime: `${timestamp}`,
+          channelCode: 'WEBVIVIET',
+          deviceId: 'TESTDEMO',
+          sessionId,
+          userId,
+          authorizedMode: 0,
+          checkerMode: 0,
+          ip: '192.168.201.140',
+          makerId: 'SONLL',
+          language: 'VN',
+        },
+      },
+    },
+  });
+
+  return listAreaResponse;
+};
+
 export const actions = {
   setNumberVerify:
     (numberVerify: string) =>
@@ -129,6 +171,11 @@ export const actions = {
         const response = await requestLogin(values.phone, values.password);
         const resultCode = get(response, 'body.resultCode', '');
         const resultDesc = get(response, 'body.resultDesc', '');
+        const userId = get(response, 'body.session.userId', '');
+        const sessionId = get(response, 'body.session.sessionId', '');
+        const responseArea = await getListArea(sessionId, userId);
+        const listArea = get(responseArea, 'body.area', []);
+
         if (resultCode === '0') {
           setState({
             ...prevState,
@@ -158,6 +205,7 @@ export const actions = {
               userName: get(response, 'body.session.userName', ''),
               sessionId: get(response, 'body.session.sessionId', ''),
             },
+            listArea,
             loggedIn: true,
           });
 
@@ -250,6 +298,7 @@ export const initialState: AuthenticationStates = {
     signConfidence: false,
     timeConfidence: false,
   },
+  listArea: [],
   ekycId: null,
   actionError: null,
   numberVerify: null,

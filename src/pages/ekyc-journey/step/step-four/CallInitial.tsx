@@ -26,7 +26,7 @@ const InitialCall: React.FC<any> = ({ isRingRing, makeCall, nextStep, prepareCal
   };
 
   const makeCallVideo = () => {
-    makeCall();
+    makeCall(false);
   };
 
   return (

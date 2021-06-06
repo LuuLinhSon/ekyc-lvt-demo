@@ -6,13 +6,26 @@ import { withRouter } from 'react-router-dom';
 import { Button } from '@material-ui/core';
 import UserInfoFormCall from './UserInfoForm';
 import { get } from 'lodash';
+import { notify } from 'components/toast/Toast';
 
-const CallVideo: React.FC<any> = ({ remoteVideo, localVideo, dataFromServer, rejectCall, nextStep, action }) => {
+const CallVideo: React.FC<any> = ({
+  remoteVideo,
+  localVideo,
+  dataFromServer,
+  rejectCall,
+  currentStep,
+  nextStep,
+  action,
+}) => {
   const ocrBackImageUrl = get(dataFromServer, 'ocrBackImageUrl', '');
   const ocrFrontImageUrl = get(dataFromServer, 'ocrFrontImageUrl', '');
   const faceImageUrls = get(dataFromServer, 'faceImageUrls', []);
   useEffect(() => {
-    if (action === 'APPROVE' || action === 'REJECT' || action === 'ENDED') return nextStep();
+    if (action === 'APPROVE' || action === 'REJECT') return nextStep();
+    if (action === 'ENDED' && currentStep === 1) {
+      return notify.error('Tất cả các tổng đài viên đều đang bận. Vui lòng gọi lại');
+    }
+    if (action === 'ENDED' && currentStep === 2) return nextStep();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [action]);
 

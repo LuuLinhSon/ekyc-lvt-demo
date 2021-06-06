@@ -129,6 +129,7 @@ interface RowOrcInterface {
   src: any;
   cardType: string;
   isCorner: boolean;
+  isPunch: boolean;
   isPhotocopy: boolean;
   isFake: boolean;
   brightness: string;
@@ -184,6 +185,7 @@ const OrcFace: React.FC<any> = (props) => {
       const isCorner = get(responseCheckOrc, 'id_check', '') === 'CORNER';
       const isPhotocopy = get(responseCheckOrc, 'id_check', '') === 'BW';
       const isFake = get(responseCheckOrc, 'id_check', '') === 'FAKE';
+      const isPunch = get(responseCheckOrc, 'id_check', '') === 'PUNCH';
       const brightness = get(responseCheckOrcQuality, 'Brightness', '');
       const isBlur = get(responseCheckOrcQuality, 'Blur', '');
 
@@ -196,6 +198,7 @@ const OrcFace: React.FC<any> = (props) => {
           isBlur,
           isPhotocopy,
           isFake,
+          isPunch,
         },
       ]);
     } catch (e) {
@@ -243,11 +246,11 @@ const OrcFace: React.FC<any> = (props) => {
 
   return (
     <div className="container-orc">
-      <RadioGroup row aria-label="orc" name="orc1" value={radio} onChange={handleChange}>
+      <RadioGroup row={true} aria-label="orc" name="orc1" value={radio} onChange={handleChange}>
         <FormControlLabel value="cmnd" control={<Radio />} label="CMND/CCCD" />
         <FormControlLabel value="face" control={<Radio />} label="Khuôn mặt" />
       </RadioGroup>
-      <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber} dataURLKey="data_url">
+      <ImageUploading multiple={true} value={images} onChange={onChange} maxNumber={maxNumber} dataURLKey="data_url">
         {({ imageList, onImageUpload, onImageRemoveAll, dragProps }) => (
           <>
             <div className="upload_image-wrapper">
@@ -318,6 +321,9 @@ const OrcFace: React.FC<any> = (props) => {
                   Photocopy
                 </StyledTableCell>
                 <StyledTableCell align="center" className="font-weight-bold">
+                  Bị đục lỗ
+                </StyledTableCell>
+                <StyledTableCell align="center" className="font-weight-bold">
                   Bị làm giả
                 </StyledTableCell>
                 <StyledTableCell align="center" className="font-weight-bold">
@@ -341,6 +347,7 @@ const OrcFace: React.FC<any> = (props) => {
                     <StyledTableCell align="center">{mapCardTypeToValue(row?.cardType)}</StyledTableCell>
                     <StyledTableCell align="center">{row?.isCorner ? 'Có' : 'Không'}</StyledTableCell>
                     <StyledTableCell align="center">{row?.isPhotocopy ? 'Có' : 'Không'}</StyledTableCell>
+                    <StyledTableCell align="center">{row?.isPunch ? 'Có' : 'Không'}</StyledTableCell>
                     <StyledTableCell align="center">{row?.isFake ? 'Có' : 'Không'}</StyledTableCell>
                     <StyledTableCell align="center">{mapBrightnessToValue(row?.brightness)}</StyledTableCell>
                     <StyledTableCell align="center">{row?.isBlur ? 'Có' : 'Không'}</StyledTableCell>
